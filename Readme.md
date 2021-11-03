@@ -8,10 +8,9 @@ Travail réalisé :
 - 1ère correction de code,
 - Création de ce fichier Readme,
 - Création de ce repository sur GitHub,
-- Ajout de ce fichier Readme.
+- Premier dépôt des fichiers du site.
 
 Travail à faire :
-- Premier dépôt des fichiers du site,
 - Hébergement du travail sur Git Pages,
 - Suite des corrections de code pour faire passer les tests présents,
 - Mise en place de tests unitaires et de tests d'intégration,
