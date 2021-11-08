@@ -13,20 +13,24 @@ export default class NewBill {
     file.addEventListener("change", this.handleChangeFile)
     this.fileUrl = null
     this.fileName = null
+    this.fileExtension = null // Code rajouté pour les seules extensions autorisées.
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
+    const fileExtension = "jpg" || "jpeg" || "png"  // Code rajouté pour les seules extensions autorisées.
     this.firestore
       .storage
-      .ref(`justificatifs/${fileName}`)
+      // .ref(`justificatifs/${fileName}`)          // Ligne originale mise en commentaire pour le test.
+      .ref(`justificatifs/${fileName}.${fileExtension}`)  // Code rajouté pour les seules extensions autorisées.
       .put(file)
       .then(snapshot => snapshot.ref.getDownloadURL())
       .then(url => {
         this.fileUrl = url
         this.fileName = fileName
+        this.fileExtension = fileExtension          // Code rajouté pour les seules extensions autorisées.
       })
   }
   handleSubmit = e => {
