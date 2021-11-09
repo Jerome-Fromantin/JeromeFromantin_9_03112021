@@ -10,7 +10,8 @@ Travail réalisé :
 - Premier dépôt des fichiers du site,
 - 2ème correction de code (Bug report - Login),
 - 3ème correction PARTIELLE de code (Bug hunt - Bills),
-- Hébergement du travail sur Git Pages.
+- Hébergement du travail sur Git Pages,
+- Avancement des corrections de code.
 
 Travail à faire :
 - Suite des corrections de code pour faire passer les tests présents,
