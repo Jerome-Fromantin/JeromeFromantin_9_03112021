@@ -13,25 +13,49 @@ export default class NewBill {
     file.addEventListener("change", this.handleChangeFile)
     this.fileUrl = null
     this.fileName = null
-    this.fileExtension = null // Code rajouté pour les seules extensions autorisées.
     new Logout({ document, localStorage, onNavigate })
   }
   handleChangeFile = e => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    const fileType = file.type  // Code rajouté pour récupérer le type.
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    const fileExtension = "jpg" || "jpeg" || "png"  // Code rajouté pour les seules extensions autorisées.
     this.firestore
       .storage
-      // .ref(`justificatifs/${fileName}`)          // Ligne originale mise en commentaire pour le test.
-      .ref(`justificatifs/${fileName}.${fileExtension}`)  // Code rajouté pour les seules extensions autorisées.
+      .ref(`justificatifs/${fileName}`)
       .put(file)
       .then(snapshot => snapshot.ref.getDownloadURL())
       .then(url => {
         this.fileUrl = url
         this.fileName = fileName
-        this.fileExtension = fileExtension          // Code rajouté pour les seules extensions autorisées.
       })
+    console.log(file)           //
+    console.log(filePath)       //
+    console.log(fileName)       //
+    console.log(fileType)       //
+    /* CODE RAJOUTE !! */
+    const fileTypes = [
+      "image/jpeg",
+      "image/png"
+    ]
+    function validFileType(file) {
+      return fileTypes.includes(fileType)
+    }
+    if (validFileType()) {
+      console.log("Glop glop !")
+    }
+    else {
+      console.log("Pas glop, pas glop !")
+      console.log(file)
+      file === ""
+      this.fileUrl = null
+      this.fileName = null
+      console.log(this.fileUrl)
+      console.log(this.fileName)
+      console.log(file)
+      alert('Seuls les fichiers de type "jpg", "jpeg" ou "png" sont autorisés.')
+    }
+    /* FIN DE RAJOUT */
   }
   handleSubmit = e => {
     e.preventDefault()

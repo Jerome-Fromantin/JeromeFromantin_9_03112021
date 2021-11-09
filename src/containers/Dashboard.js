@@ -137,9 +137,9 @@ export default class {
       console.log('test1')                                             // A SUPPRIMER !!
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
       console.log('test1b')                                             // A SUPPRIMER !!
-      $(`#status-bills-container${this.index}`)                         // PROBLEME A REGLER !!
-        .html(cards(filteredBills(bills, getStatus(this.index))))
+      $(`#status-bills-container${this.index}`).html(cards(filteredBills(bills, getStatus(this.index))))
       this.counter ++
+      console.log(this.counter)                                             // A SUPPRIMER !!
     } else {
       console.log('test2')                                             // A SUPPRIMER !!
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})

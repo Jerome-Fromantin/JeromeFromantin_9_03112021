@@ -72,4 +72,3 @@ export default () => {
     </div>
   `)
 }
-/* Ligne 58 : Ajout de l'attribut "accept" pour les seules extensions autorisées. */

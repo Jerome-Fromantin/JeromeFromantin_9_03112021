@@ -28,14 +28,14 @@ const billPending = {
   "status": "pending"
 }
 
-const billrefused = {
+const billRefused = {
   ...bill,
   "status": "refused"
 }
 
 describe('Given I am connected as an Admin and I am on Dashboard Page', () => {
   describe('When bill data is passed to DashboardUI', () => {
-    test(('Then, it should them in the page'), () => {
+    test(('Then, it should show them in the page'), () => {
       const html = DashboardFormUI(bill)
       document.body.innerHTML = html
       expect(screen.getByText(bill.vat)).toBeTruthy()
@@ -64,9 +64,9 @@ describe('Given I am connected as an Admin and I am on Dashboard Page', () => {
       expect(screen.getByText(bill.commentAdmin)).toBeTruthy()
     })
   })
-  describe('When acceptrefuseded bill is passed to DashboardUI', () => {
+  describe('When refused bill is passed to DashboardUI', () => {
     test(('Then, it should show admin commentary'), () => {
-      const html = DashboardFormUI(billrefused)
+      const html = DashboardFormUI(billRefused)
       document.body.innerHTML = html
       expect(screen.getByText(bill.commentAdmin)).toBeTruthy()
     })

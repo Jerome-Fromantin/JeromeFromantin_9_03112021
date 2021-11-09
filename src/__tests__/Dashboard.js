@@ -73,7 +73,7 @@ describe('Given I am connected as an Admin', () => {
       icon1.addEventListener('click', handleShowTickets1)
       userEvent.click(icon1)
       expect(handleShowTickets1).toHaveBeenCalled()
-      //userEvent.click(icon1)                            // Mise en commentaire de la ligne.
+      //userEvent.click(icon1)                            // Mise en commentaire pour test.
 
       icon2.addEventListener('click', handleShowTickets2)
       userEvent.click(icon2)

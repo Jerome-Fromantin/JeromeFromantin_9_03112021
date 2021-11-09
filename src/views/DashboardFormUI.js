@@ -14,8 +14,7 @@ export const modal = () => (`
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body" data-toggle="modal">
-        </div>
+        <div class="modal-body" data-toggle="modal"></div>
       </div>
     </div>
   </div>
@@ -67,7 +66,7 @@ export default (bill) => {
       <div class="row">
         <div class="col-sm">
           <label for="file" class="bold-label">Justificatif</label>
-            <div class='input-field input-flex file-flex'>
+          <div class='input-field input-flex file-flex'>
             <span id="file-name-admin">${bill.fileName}</span>
             <div class='icons-container'>
               <span id="icon-eye-d" data-testid="icon-eye-d" data-bill-url="${bill.fileUrl}"> ${eyeWhite} </span>
