@@ -20,7 +20,21 @@ export default class NewBill {
     const fileType = file.type  // Code rajouté pour récupérer le type.
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    this.firestore
+    console.log(file)           //
+    console.log(fileType)       //
+    console.log(filePath)       //
+    console.log(fileName)       //
+    /* CODE RAJOUTE !! */
+    const fileTypes = [
+      "image/jpeg",
+      "image/png"
+    ]
+    function validFileType() {
+      return fileTypes.includes(fileType)
+    }
+    if (validFileType()) {
+      console.log("Fichier valide")
+      this.firestore
       .storage
       .ref(`justificatifs/${fileName}`)
       .put(file)
@@ -29,25 +43,11 @@ export default class NewBill {
         this.fileUrl = url
         this.fileName = fileName
       })
-    console.log(file)           //
-    console.log(filePath)       //
-    console.log(fileName)       //
-    console.log(fileType)       //
-    /* CODE RAJOUTE !! */
-    const fileTypes = [
-      "image/jpeg",
-      "image/png"
-    ]
-    function validFileType(file) {
-      return fileTypes.includes(fileType)
-    }
-    if (validFileType()) {
-      console.log("Glop glop !")
     }
     else {
-      console.log("Pas glop, pas glop !")
+      console.log("Fichier non valide")
       console.log(file)
-      file === ""
+      document.querySelector(`input[data-testid="file"]`).value = null
       this.fileUrl = null
       this.fileName = null
       console.log(this.fileUrl)
