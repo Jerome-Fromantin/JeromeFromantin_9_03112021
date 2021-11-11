@@ -11,7 +11,8 @@ Travail réalisé :
 - 2ème correction de code (Bug report - Login),
 - 3ème correction PARTIELLE de code (Bug hunt - Bills),
 - Hébergement du travail sur Git Pages,
-- Avancement des corrections de code.
+- Avancement des corrections de code,
+- Début de mise en place de plusieurs tests unitaires.
 
 Travail à faire :
 - Suite des corrections de code pour faire passer les tests présents,
