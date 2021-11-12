@@ -1,6 +1,7 @@
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { fireEvent, screen } from "@testing-library/dom"
+import "@testing-library/jest-dom"
 
 describe("Given I am connected as an employee", () => {
   /* SYNTAXE D'ORIGINE
@@ -16,50 +17,91 @@ describe("Given I am connected as an employee", () => {
     test("Then the form should be displayed.", () => {
       const html = NewBillUI()
       document.body.innerHTML = html
-      expect(NewBillUI()).toMatch(html)
-      /* Test bien écrit ?! */
+      const formNewBill = screen.getByTestId("form-new-bill")
+      expect(formNewBill).toBeVisible()
     })
   })
-  describe("When I am on NewBill Page and I click on button with empty fields", () => {
-    test("Then it should ...", () => {
+  describe("When I am on NewBill Page and I leave empty fields", () => {
+    test("Then the fields should be really empty and some fields should be required.", () => {
       const expenseType = screen.getByTestId("expense-type")
-      expect((expenseType.value = null)).toBeNull()
-      //expect(expenseType.value = "Repas").toBeFalsy()
-      expect(expenseType.value = "Services en ligne").not.toBe("Transports")
-      expect(expenseType.value = "Transports").toBe("Transports")
-      const expenseTypeOption = screen.getByDisplayValue("Transports")
-      const expenseTypeTestValue = "Transports"
-      expect(expenseTypeOption.value).toContain(expenseTypeTestValue)
+      expect(expenseType.value).toBe("Transports") // 1ère option visible de la liste déroulante.
+      expect(expenseType).toBeRequired()
 
       const expenseName = screen.getByTestId("expense-name")
       expect(expenseName.value).toBe("")
+      expect(expenseName).not.toBeRequired()
 
       const expenseDate = screen.getByTestId("datepicker")
       expect(expenseDate.value).toBe("")
+      expect(expenseDate).toBeRequired()
 
       const expenseAmount = screen.getByTestId("amount")
       expect(expenseAmount.value).toBe("")
+      expect(expenseAmount).toBeRequired()
 
       const expenseTVA = screen.getByTestId("vat")
       expect(expenseTVA.value).toBe("")
+      expect(expenseTVA).not.toBeRequired()
 
       const expensePourcent = screen.getByTestId("pct")
       expect(expensePourcent.value).toBe("")
+      expect(expensePourcent).toBeRequired()
       
       const expenseComment = screen.getByTestId("commentary")
       expect(expenseComment.value).toBe("")
+      expect(expenseComment).not.toBeRequired()
+    })
+  })
+  describe("When I am on NewBill Page and I fill fields", () => {
+    test("Then the fields should be correctly filled.", () => {
+      const expenseType = screen.getByTestId("expense-type")
+      expect(expenseType.value = "Services en ligne").toBe("Services en ligne")
+
+      const expenseName = screen.getByTestId("expense-name")
+      expect(expenseName.value = "Abonnement site").toBe("Abonnement site")
+
+      const expenseDate = screen.getByTestId("datepicker")
+      expect(expenseDate.value = "12/11/2021").toBe("12/11/2021")
+
+      const expenseAmount = screen.getByTestId("amount")
+      expect(expenseAmount.value = "120").toBe("120")
+
+      const expenseTVA = screen.getByTestId("vat")
+      expect(expenseTVA.value = "12").toBe("12")
+
+      const expensePourcent = screen.getByTestId("pct")
+      expect(expensePourcent.value = "10").toBe("10")
+      
+      const expenseComment = screen.getByTestId("commentary")
+      expect(expenseComment.value = "Ceci est un commentaire.").toBe("Ceci est un commentaire.")
     })
   })
   describe("When I upload a file with correct extension", () => {
-    test("Then the Bills page modal should show the image.", () => {
-    const virtual = new File([], "virtualFile.jpg", { type: "image/jpeg"})
+    test("Then the file name should be displayed.", () => {
+    let virtual = new File([""], "virtual.jpg", { type: "image/jpeg"})
     const html = NewBillUI()
     document.body.innerHTML = html
+    virtual = document.querySelector(`input[data-testid="file"]`)
     const newBillInput = screen.getByTestId("file")
-    //newBillInput.value = "virtualFile.jpg"
-    fireEvent.change(newBillInput, { target: { fileName: "virtualFile.jpg" } })
-    console.log(newBillInput.files[0])
-    expect(NewBill).toBeTruthy()
+    fireEvent.change(newBillInput, { target: { value: "" } })
+    console.log(newBillInput)       // Affiche : HTMLInputElement {}
+    console.log(newBillInput.value) // N'affiche rien
+    expect(newBillInput.value).toBe("virtual.jpg")
     })
   })
+  /* A MODIFIER
+  describe("When I upload a file with wrong extension", () => {
+    test("Then the file name should not be displayed.", () => {
+    let virtual = new File([""], "virtual.txt", { type: "text/plain"})
+    const html = NewBillUI()
+    document.body.innerHTML = html
+    virtual = document.querySelector(`input[data-testid="file"]`)
+    const newBillInput = screen.getByTestId("file")
+    fireEvent.change(newBillInput, { target: { value: "virtual.txt" } })
+    console.log(newBillInput)
+    console.log(newBillInput.value)
+    expect(newBillInput.value).not.toBeVisible()
+    })
+  })
+  */
 })

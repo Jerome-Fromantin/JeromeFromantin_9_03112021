@@ -20,11 +20,7 @@ export default class NewBill {
     const fileType = file.type  // Code rajouté pour récupérer le type.
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    console.log(file)           //
-    console.log(fileType)       //
-    console.log(filePath)       //
-    console.log(fileName)       //
-    /* CODE RAJOUTE !! */
+    /* RAJOUT DE CODE */
     const fileTypes = [
       "image/jpeg",
       "image/png"
@@ -33,7 +29,6 @@ export default class NewBill {
       return fileTypes.includes(fileType)
     }
     if (validFileType()) {
-      console.log("Fichier valide")
       this.firestore
       .storage
       .ref(`justificatifs/${fileName}`)
@@ -45,14 +40,9 @@ export default class NewBill {
       })
     }
     else {
-      console.log("Fichier non valide")
-      console.log(file)
       document.querySelector(`input[data-testid="file"]`).value = null
       this.fileUrl = null
       this.fileName = null
-      console.log(this.fileUrl)
-      console.log(this.fileName)
-      console.log(file)
       alert('Seuls les fichiers de type "jpg", "jpeg" ou "png" sont autorisés.')
     }
     /* FIN DE RAJOUT */
