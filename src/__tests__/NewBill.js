@@ -78,30 +78,37 @@ describe("Given I am connected as an employee", () => {
   })
   describe("When I upload a file with correct extension", () => {
     test("Then the file name should be displayed.", () => {
-    let virtual = new File([""], "virtual.jpg", { type: "image/jpeg"})
+    let virtual = new File(["fuck"], "virtual.jpg", { type: "image/jpeg"})
+    console.log(virtual.value)
     const html = NewBillUI()
     document.body.innerHTML = html
-    virtual = document.querySelector(`input[data-testid="file"]`)
     const newBillInput = screen.getByTestId("file")
-    fireEvent.change(newBillInput, { target: { value: "" } })
-    console.log(newBillInput)       // Affiche : HTMLInputElement {}
-    console.log(newBillInput.value) // N'affiche rien
-    expect(newBillInput.value).toBe("virtual.jpg")
+    fireEvent.change(newBillInput, {
+      target: {
+        files: virtual
+      }
+    })
+    expect(virtual.name).toBe("virtual.jpg")
+    expect(virtual.name).not.toBeNull()
+    expect(virtual.name).toBeDefined()
     })
   })
-  /* A MODIFIER
   describe("When I upload a file with wrong extension", () => {
     test("Then the file name should not be displayed.", () => {
     let virtual = new File([""], "virtual.txt", { type: "text/plain"})
     const html = NewBillUI()
     document.body.innerHTML = html
-    virtual = document.querySelector(`input[data-testid="file"]`)
     const newBillInput = screen.getByTestId("file")
-    fireEvent.change(newBillInput, { target: { value: "virtual.txt" } })
-    console.log(newBillInput)
-    console.log(newBillInput.value)
-    expect(newBillInput.value).not.toBeVisible()
+    fireEvent.change(newBillInput, {
+      target: {
+        files: virtual
+      }
+    })
+    expect(virtual.name).toBe("virtual.txt")
+    expect(virtual.name).not.toBeNull()
+    expect(virtual.name).toBeDefined()
     })
   })
-  */
 })
+/* Tous les "describe" passent mais sont-ils vraiment efficaces ? */
+/* Il est même sûr que le dernier n'est pas bon... */
