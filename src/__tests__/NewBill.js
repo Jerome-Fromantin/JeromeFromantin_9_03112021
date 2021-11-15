@@ -22,7 +22,7 @@ describe("Given I am connected as an employee", () => {
     })
   })
   describe("When I am on NewBill Page and I leave empty fields", () => {
-    test("Then the fields should be really empty and some fields should be required.", () => {
+    test("Then the fields should really be empty and some fields should be required.", () => {
       const expenseType = screen.getByTestId("expense-type")
       expect(expenseType.value).toBe("Transports") // 1ère option visible de la liste déroulante.
       expect(expenseType).toBeRequired()
@@ -52,8 +52,33 @@ describe("Given I am connected as an employee", () => {
       expect(expenseComment).not.toBeRequired()
     })
   })
-  describe("When I am on NewBill Page and I fill fields", () => {
-    test("Then the fields should be correctly filled.", () => {
+  describe("When I am on NewBill Page and I leave some fields empty or incorrectly filled", () => {
+    test("Then these fields should throw an error message.", () => {
+      const expenseDate = screen.getByTestId("datepicker")
+      expect(() => { expenseDate("jj/mm/aaaa") }).toThrowError()
+      expect(() => { expenseDate("01/01/0000") }).toThrowError()
+
+      const expenseAmount = screen.getByTestId("amount")
+      expect(() => { expenseAmount("") }).toThrowError()
+      expect(() => { expenseAmount("aaa") }).toThrowError()
+
+      const expensePourcent = screen.getByTestId("pct")
+      expect(() => { expensePourcent("") }).toThrowError()
+      expect(() => { expensePourcent("aaa") }).toThrowError()
+
+      let virtualFile = new File([""], "virtual.txt", { type: "text/plain"})
+      const fileInput = screen.getByTestId("file")
+      fireEvent.change(fileInput, {
+        target: {
+          files: virtualFile
+        }
+      })
+      expect(() => { fileInput("") }).toThrowError()
+      expect(() => { fileInput(virtualFile) }).toThrowError()
+    })
+  })
+  describe("When I am on NewBill Page and I fill fields correctly", () => {
+    test("Then the fields should really be correctly filled.", () => {
       const expenseType = screen.getByTestId("expense-type")
       expect(expenseType.value = "Services en ligne").toBe("Services en ligne")
 
@@ -74,39 +99,31 @@ describe("Given I am connected as an employee", () => {
       
       const expenseComment = screen.getByTestId("commentary")
       expect(expenseComment.value = "Ceci est un commentaire.").toBe("Ceci est un commentaire.")
-    })
-  })
-  describe("When I upload a file with correct extension", () => {
-    test("Then the file name should be displayed.", () => {
-    let virtual = new File(["fuck"], "virtual.jpg", { type: "image/jpeg"})
-    console.log(virtual.value)
-    const html = NewBillUI()
-    document.body.innerHTML = html
-    const newBillInput = screen.getByTestId("file")
-    fireEvent.change(newBillInput, {
-      target: {
-        files: virtual
-      }
-    })
-    expect(virtual.name).toBe("virtual.jpg")
-    expect(virtual.name).not.toBeNull()
-    expect(virtual.name).toBeDefined()
+
+      let virtualFile = new File([""], "virtual.jpg", { type: "image/jpeg"})
+      const fileInput = screen.getByTestId("file")
+      fireEvent.change(fileInput, {
+        target: {
+          files: virtualFile
+        }
+      })
+      expect(virtualFile.name).toBe("virtual.jpg")
     })
   })
   describe("When I upload a file with wrong extension", () => {
     test("Then the file name should not be displayed.", () => {
-    let virtual = new File([""], "virtual.txt", { type: "text/plain"})
+    let virtualFile = new File([""], "virtual.txt", { type: "text/plain"})
     const html = NewBillUI()
     document.body.innerHTML = html
     const newBillInput = screen.getByTestId("file")
     fireEvent.change(newBillInput, {
       target: {
-        files: virtual
+        files: virtualFile
       }
     })
-    expect(virtual.name).toBe("virtual.txt")
-    expect(virtual.name).not.toBeNull()
-    expect(virtual.name).toBeDefined()
+    expect(virtualFile.name).toBe("virtual.txt")
+    expect(virtualFile.name).not.toBeNull()
+    expect(virtualFile.name).toBeDefined()
     })
   })
 })
