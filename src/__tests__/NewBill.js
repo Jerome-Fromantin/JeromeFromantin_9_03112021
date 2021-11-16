@@ -54,22 +54,46 @@ describe("Given I am connected as an employee", () => {
   })
   describe("When I am on NewBill Page and I leave some fields empty or incorrectly filled", () => {
     test("Then these fields should throw an error message.", () => {
+      //const mockTest = jest.fn()
+      //mockTest.mockReturnValue("2000-01-01")
+      //console.log(mockTest())
+
+      //expenseDate.value = mockTest()
+      //expect(() => { mockTest().value }).toReturn()
+
       const expenseDate = screen.getByTestId("datepicker")
+      expenseDate.value = "yyyy-mm-dd" // Champ vide.
+      //console.log(expenseDate.value) // N'affiche rien.
+      expect(expenseDate.value).toBe("")
+      expect(expenseDate.value.length).toBe(0)
+      // Test de message d'erreur ??
+      // expect().toXxx()
+
+      expenseDate.value = "0000-01-01" // Valeur incorrecte.
+      //console.log(expenseDate.value) // N'affiche rien.
+      expect(expenseDate.value).toBe("")
+      expect(expenseDate.value.length).toBe(0)
+      // Test de message d'erreur ??
+      // expect().toXxx()
+
       expect(() => { expenseDate("jj/mm/aaaa") }).toThrowError() // Passe, ok.
       expect(() => { expenseDate("01/01/0000") }).toThrowError() // Passe, ok.
-      expect(() => { expenseDate("01/01/2000") }).toThrowError() // Passe, mais ne devrait pas...
+      expect(() => { expenseDate("01/01/2000") }).toThrowError() // Passe, ok.
+      expect(() => { expenseDate("2000-01-01") }).toThrowError() // Passe, mais ne devrait pas...
       //expect(() => { expenseDate.value = "2000-01-01" }).toThrowError() // Ne passe pas, ok.
       //expect(() => { expenseDate.value = "0000-01-01" }).toThrowError() // Ne passe pas, mais devrait...
 
+      //const expenseAmount = () => { screen.getByTestId("amount") }
       const expenseAmount = screen.getByTestId("amount")
-      expect(() => { expenseAmount("") }).toThrowError() // Passe, ok.
+      //expect(() => { expenseAmount() }).toThrow("Veuillez saisir un nombre.") // Ne passe pas, mais devrait...
       expect(() => { expenseAmount("aaa") }).toThrowError() // Passe, ok.
-      expect(() => { expenseAmount("348") }).toThrowError() // Passe, mais ne devrait pas...
-      //expect(() => { expenseAmount.value = "aaa" }).toThrowError() // Ne passe pas, mais devrait...
+      expect(() => { expenseAmount(348) }).toThrowError()   // Passe, mais ne devrait pas...
+      expect(() => { expenseAmount.value = "aaa" }).toThrowError() // Passe, ok.
 
       const expensePourcent = screen.getByTestId("pct")
-      expect(() => { expensePourcent("") }).toThrowError()
-      expect(() => { expensePourcent("aaa") }).toThrowError()
+      expect(() => { expensePourcent("") }).toThrowError()    // Passe, ok.
+      expect(() => { expensePourcent("aaa") }).toThrowError() // Passe, ok.
+      expect(() => { expensePourcent(50) }).toThrowError()    // Passe, mais ne devrait pas...
 
       let virtualFile = new File([""], "virtual.txt", { type: "text/plain"})
       const fileInput = screen.getByTestId("file")
@@ -133,5 +157,5 @@ describe("Given I am connected as an employee", () => {
     })
   })
 })
-/* Tous les "describe" passent (sauf lignes 62 et 68) mais sont-ils vraiment efficaces ? */
+/* Plusieurs "describe" passent mais sont-ils vraiment efficaces ? */
 /* Il est même sûr que le dernier n'est pas bon... */
