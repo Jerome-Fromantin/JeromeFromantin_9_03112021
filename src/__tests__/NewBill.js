@@ -1,5 +1,6 @@
 import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
+import { ROUTES } from "../constants/routes"
 import { fireEvent, screen } from "@testing-library/dom"
 import "@testing-library/jest-dom"
 
@@ -17,6 +18,7 @@ describe("Given I am connected as an employee", () => {
     test("Then the form should be displayed.", () => {
       const html = NewBillUI()
       document.body.innerHTML = html
+
       const formNewBill = screen.getByTestId("form-new-bill")
       expect(formNewBill).toBeVisible()
     })
@@ -53,61 +55,119 @@ describe("Given I am connected as an employee", () => {
     })
   })
   describe("When I am on NewBill Page and I leave some fields empty or incorrectly filled", () => {
-    test("Then these fields should throw an error message.", () => {
-      //const mockTest = jest.fn()
-      //mockTest.mockReturnValue("2000-01-01")
-      //console.log(mockTest())
+    test("Then these fields should throw an error message after submit.", () => {
+      const html = NewBillUI()
+      document.body.innerHTML = html
 
-      //expenseDate.value = mockTest()
-      //expect(() => { mockTest().value }).toReturn()
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      const firestore = jest.fn()
 
-      const expenseDate = screen.getByTestId("datepicker")
-      expenseDate.value = "yyyy-mm-dd" // Champ vide.
-      //console.log(expenseDate.value) // N'affiche rien.
-      expect(expenseDate.value).toBe("")
-      expect(expenseDate.value.length).toBe(0)
-      // Test de message d'erreur ??
-      // expect().toXxx()
-
-      expenseDate.value = "0000-01-01" // Valeur incorrecte.
-      //console.log(expenseDate.value) // N'affiche rien.
-      expect(expenseDate.value).toBe("")
-      expect(expenseDate.value.length).toBe(0)
-      // Test de message d'erreur ??
-      // expect().toXxx()
-
-      expect(() => { expenseDate("jj/mm/aaaa") }).toThrowError() // Passe, ok.
-      expect(() => { expenseDate("01/01/0000") }).toThrowError() // Passe, ok.
-      expect(() => { expenseDate("01/01/2000") }).toThrowError() // Passe, ok.
-      expect(() => { expenseDate("2000-01-01") }).toThrowError() // Passe, mais ne devrait pas...
-      //expect(() => { expenseDate.value = "2000-01-01" }).toThrowError() // Ne passe pas, ok.
-      //expect(() => { expenseDate.value = "0000-01-01" }).toThrowError() // Ne passe pas, mais devrait...
-
-      //const expenseAmount = () => { screen.getByTestId("amount") }
-      const expenseAmount = screen.getByTestId("amount")
-      //expect(() => { expenseAmount() }).toThrow("Veuillez saisir un nombre.") // Ne passe pas, mais devrait...
-      expect(() => { expenseAmount("aaa") }).toThrowError() // Passe, ok.
-      expect(() => { expenseAmount(348) }).toThrowError()   // Passe, mais ne devrait pas...
-      expect(() => { expenseAmount.value = "aaa" }).toThrowError() // Passe, ok.
-
-      const expensePourcent = screen.getByTestId("pct")
-      expect(() => { expensePourcent("") }).toThrowError()    // Passe, ok.
-      expect(() => { expensePourcent("aaa") }).toThrowError() // Passe, ok.
-      expect(() => { expensePourcent(50) }).toThrowError()    // Passe, mais ne devrait pas...
-
-      let virtualFile = new File([""], "virtual.txt", { type: "text/plain"})
-      const fileInput = screen.getByTestId("file")
-      fireEvent.change(fileInput, {
-        target: {
-          files: virtualFile
+      function getCurrentUser(user) {
+        if (user == "user") {
+          const currentUser = {
+            email: "jeromefromantin@hotmail.fr"
+          }
+          return JSON.stringify(currentUser)
         }
+        return null
+      }
+
+      Object.defineProperty(window, "localStorage", {
+        value: {
+          getItem: jest.fn(getCurrentUser),
+          setItem: jest.fn(() => null)
+        },
+        writable: true
       })
-      expect(() => { fileInput("") }).toThrowError()
-      expect(() => { fileInput(virtualFile) }).toThrowError()
+
+      const nouvelleNote = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
+      nouvelleNote.createBill = jest.fn()
+
+      const formNewBill = screen.getByTestId("form-new-bill")
+      const handleSubmit = jest.fn(nouvelleNote.handleSubmit)
+
+      /* Récupération des 4 champs pouvant produire un message d'erreur */
+      const expenseDate = screen.getByTestId("datepicker")
+      const expenseAmount = screen.getByTestId("amount")
+      const expensePourcent = screen.getByTestId("pct")
+      const fileInput = screen.getByTestId("file")
+
+      /* DATE */
+      Object.defineProperty(expenseDate, "value", {
+        value: "",                      // Champ vide.
+        writable: true
+      })
+      expect(expenseDate.value).toBe("")
+      expect(expenseDate.value.length).toBe(0)
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      expenseDate.value = "0000-01-01"  // Valeur incorrecte.
+      expect(expenseDate.value).toBe("0000-01-01")
+      expect(expenseDate.value.split("-")[0]).toBe("0000")
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      /* MONTANT */
+      Object.defineProperty(expenseAmount, "value", {
+        value: "",                      // Champ vide.
+        writable: true
+      })
+      expect(expenseAmount.value).toBe("")
+      expect(expenseAmount.value.length).toBe(0)
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      expenseAmount.value = "aaa"  // Valeur incorrecte.
+      expect(expenseAmount.value).toBe("aaa")
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      /* POURCENTAGE */
+      Object.defineProperty(expensePourcent, "value", {
+        value: "",                      // Champ vide.
+        writable: true
+      })
+      expect(expensePourcent.value).toBe("")
+      expect(expensePourcent.value.length).toBe(0)
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      expensePourcent.value = "aaa"  // Valeur incorrecte.
+      expect(expensePourcent.value).toBe("aaa")
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      /* UPLOAD */
+      Object.defineProperty(fileInput, "value", {
+        files: "",                      // Champ vide.
+        writable: true
+      })
+      expect(fileInput.value).toBeUndefined()
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
+
+      fileInput.value = new File([""], "virtual.txt", { type: "text/plain"})  // Valeur incorrecte.
+      console.log(fileInput.value.name)
+      expect(fileInput.value.name).toBe("virtual.txt")
+      formNewBill.addEventListener("submit", handleSubmit)
+      fireEvent.submit(formNewBill)
+      expect(handleSubmit).toHaveBeenCalled()
     })
   })
   describe("When I am on NewBill Page and I fill fields correctly", () => {
     test("Then the fields should really be correctly filled.", () => {
+      const html = NewBillUI()
+      document.body.innerHTML = html
       const expenseType = screen.getByTestId("expense-type")
       expect(expenseType.value = "Services en ligne").toBe("Services en ligne")
 
