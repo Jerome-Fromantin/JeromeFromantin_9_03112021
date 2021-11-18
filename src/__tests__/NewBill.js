@@ -23,8 +23,8 @@ describe("Given I am connected as an employee", () => {
       expect(formNewBill).toBeVisible()
     })
   })
-  describe("When I am on NewBill Page and I leave empty fields", () => {
-    test("Then the fields should really be empty and some fields should be required.", () => {
+  describe("When I am on NewBill Page and I haven't done anything", () => {
+    test("Then the fields should be empty and some fields should be required.", () => {
       const expenseType = screen.getByTestId("expense-type")
       expect(expenseType.value).toBe("Transports") // 1ère option visible de la liste déroulante.
       expect(expenseType).toBeRequired()
@@ -52,6 +52,10 @@ describe("Given I am connected as an employee", () => {
       const expenseComment = screen.getByTestId("commentary")
       expect(expenseComment.value).toBe("")
       expect(expenseComment).not.toBeRequired()
+
+      const fileInput = screen.getByTestId("file")
+      expect(fileInput.value).toBe("")
+      expect(fileInput).toBeRequired()
     })
   })
   describe("When I am on NewBill Page and I leave some fields empty or incorrectly filled", () => {
@@ -86,6 +90,7 @@ describe("Given I am connected as an employee", () => {
       nouvelleNote.createBill = jest.fn()
 
       const formNewBill = screen.getByTestId("form-new-bill")
+      //const validateFields = jest.fn(nouvelleNote.validateFields) // Test de validation des champs
       const handleSubmit = jest.fn(nouvelleNote.handleSubmit)
 
       /* Récupération des 4 champs pouvant produire un message d'erreur */
@@ -114,20 +119,40 @@ describe("Given I am connected as an employee", () => {
 
       /* MONTANT */
       Object.defineProperty(expenseAmount, "value", {
-        value: "",                      // Champ vide.
+        value: "aaa",
         writable: true
       })
-      expect(expenseAmount.value).toBe("")
-      expect(expenseAmount.value.length).toBe(0)
-      formNewBill.addEventListener("submit", handleSubmit)
-      fireEvent.submit(formNewBill)
-      expect(handleSubmit).toHaveBeenCalled()
-
-      expenseAmount.value = "aaa"  // Valeur incorrecte.
-      expect(expenseAmount.value).toBe("aaa")
-      formNewBill.addEventListener("submit", handleSubmit)
-      fireEvent.submit(formNewBill)
-      expect(handleSubmit).toHaveBeenCalled()
+      console.log(expenseAmount.value.length)
+      if (expenseAmount.value.length == 0) {
+        console.log("Montant manquant !")
+        expect(expenseAmount.value).toBe("")
+        expect(expenseAmount.value.length).toBe(0)
+        //expenseAmount.addEventListener("focusout", validateFields)
+        //fireEvent.focusOut(expenseAmount)
+        formNewBill.addEventListener("submit", handleSubmit)
+        fireEvent.submit(formNewBill)
+        //expect(validateFields).toHaveBeenCalled()
+        expect(handleSubmit).toHaveBeenCalled()
+      }
+      else if (isNaN(expenseAmount.value)) {
+        console.log("Montant en lettres !")
+        expect(expenseAmount.value).toBeNaN()
+        formNewBill.addEventListener("submit", handleSubmit)
+        fireEvent.submit(formNewBill)
+        //expect(validateFields).toHaveBeenCalled()
+        expect(handleSubmit).toHaveBeenCalled()
+      }
+      else if (expenseAmount.value <= 0) {
+        console.log("Montant inférieur ou égal à 0 !")
+        expect(parseInt(expenseAmount.value)).toBeLessThanOrEqual(0)
+        formNewBill.addEventListener("submit", handleSubmit)
+        fireEvent.submit(formNewBill)
+        //expect(validateFields).toHaveBeenCalled()
+        expect(handleSubmit).toHaveBeenCalled()
+      }
+      else {
+        console.log("OK")
+      }
 
       /* POURCENTAGE */
       Object.defineProperty(expensePourcent, "value", {
@@ -157,7 +182,6 @@ describe("Given I am connected as an employee", () => {
       expect(handleSubmit).toHaveBeenCalled()
 
       fileInput.value = new File([""], "virtual.txt", { type: "text/plain"})  // Valeur incorrecte.
-      console.log(fileInput.value.name)
       expect(fileInput.value.name).toBe("virtual.txt")
       formNewBill.addEventListener("submit", handleSubmit)
       fireEvent.submit(formNewBill)

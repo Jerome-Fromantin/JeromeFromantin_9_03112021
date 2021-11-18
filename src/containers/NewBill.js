@@ -15,6 +15,23 @@ export default class NewBill {
     this.fileName = null
     new Logout({ document, localStorage, onNavigate })
   }
+
+  /* RAJOUT DE CODE */
+  validateFields = e => {
+    e.preventDefault()
+    const expenseAmount = e.target.querySelector(`input[data-testid="amount"]`)//.value
+    if (expenseAmount == null) {
+      console.log("Montant manquant !")
+    }
+    else if (isNaN(expenseAmount)) {
+      console.log("Montant en lettres !")
+    }
+    else if (expenseAmount <= 0) {
+      console.log("Montant inférieur ou égal à 0 !")
+    }
+  }
+  /* FIN DE RAJOUT */
+
   handleChangeFile = e => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const fileType = file.type  // Code rajouté pour récupérer le type.
@@ -47,6 +64,7 @@ export default class NewBill {
     }
     /* FIN DE RAJOUT */
   }
+
   handleSubmit = e => {
     e.preventDefault()
     // console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
@@ -55,8 +73,8 @@ export default class NewBill {
       email,
       type: e.target.querySelector(`select[data-testid="expense-type"]`).value,
       name:  e.target.querySelector(`input[data-testid="expense-name"]`).value,
-      amount: parseInt(e.target.querySelector(`input[data-testid="amount"]`).value),
       date:  e.target.querySelector(`input[data-testid="datepicker"]`).value,
+      amount: parseInt(e.target.querySelector(`input[data-testid="amount"]`).value),
       vat: e.target.querySelector(`input[data-testid="vat"]`).value,
       pct: parseInt(e.target.querySelector(`input[data-testid="pct"]`).value) || 20,
       commentary: e.target.querySelector(`textarea[data-testid="commentary"]`).value,
