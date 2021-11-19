@@ -12,10 +12,11 @@ Travail réalisé :
 - 3ème correction PARTIELLE de code (Bug hunt - Bills),
 - Hébergement du travail sur Git Pages,
 - Avancement des corrections de code,
-- Début de mise en place de plusieurs tests unitaires.
+- Mise en place de plusieurs tests unitaires,
+- Mise en place de la validation des données dans les champs requis du formulaire "NewBill".
 
 Travail à faire :
-- Suite des corrections de code pour faire passer les tests présents,
+- Suite des corrections de code pour faire passer les tests présents (??),
 - Mise en place de tests unitaires et de tests d'intégration,
 - Mise en place d'un plan de test End 2 End.
 - Et d'autres choses ??
