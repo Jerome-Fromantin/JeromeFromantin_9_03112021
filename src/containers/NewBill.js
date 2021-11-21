@@ -16,22 +16,6 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
 
-  /* RAJOUT DE CODE */
-  validateFields = e => {
-    e.preventDefault()
-    const expenseAmount = e.target.querySelector(`input[data-testid="amount"]`)//.value
-    if (expenseAmount == null) {
-      console.log("Montant manquant !")
-    }
-    else if (isNaN(expenseAmount)) {
-      console.log("Montant en lettres !")
-    }
-    else if (expenseAmount <= 0) {
-      console.log("Montant inférieur ou égal à 0 !")
-    }
-  }
-  /* FIN DE RAJOUT */
-
   handleChangeFile = e => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const fileType = file.type  // Code rajouté pour récupérer le type.
