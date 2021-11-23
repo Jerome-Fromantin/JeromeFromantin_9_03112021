@@ -17,8 +17,10 @@ export default class NewBill {
   }
 
   handleChangeFile = e => {
-    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-    const fileType = file.type  // Code rajouté pour récupérer le type.
+    const realFile = e.target.querySelector(`input[data-testid="file"]`).files[0]
+    //this.document, pas e.target
+    console.log(realFile)
+    const fileType = realFile.type  // Code rajouté pour récupérer le type.
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
     /* RAJOUT DE CODE */

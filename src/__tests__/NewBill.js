@@ -15,8 +15,8 @@ describe("Given I am connected as an employee", () => {
   })
   */
   /* CI-DESSOUS, MA SYNTAXE */
-  describe("When I am on NewBill Page and I leave some fields empty or incorrectly filled", () => {
-    test("Then these fields should throw an error message after submit.", () => {
+  describe("When I am on NewBill Page and I upload a file", () => {
+    test("Then the file type should be verified and the file rejected if not valid.", () => {
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -47,15 +47,12 @@ describe("Given I am connected as an employee", () => {
       nouvelleNote.createBill = jest.fn()
 
       const formNewBill = screen.getByTestId("form-new-bill")
+      const handleChangeFile = jest.fn(nouvelleNote.handleChangeFile) // ???
       const handleSubmit = jest.fn(nouvelleNote.handleSubmit)
+      //const validFileType = jest.fn(validFileType) // ???
 
-      /* Récupération des 4 champs pouvant produire un message d'erreur */
-      const expenseDate = screen.getByTestId("datepicker")
-      const expenseAmount = screen.getByTestId("amount")
-      const expensePourcent = screen.getByTestId("pct")
-      const fileInput = screen.getByTestId("file")
-
-      /* DATE */
+      /* DATE : Test apparemment inutile pour le "coverage". */
+      /*const expenseDate = screen.getByTestId("datepicker")
       Object.defineProperty(expenseDate, "value", {
         value: "",
         //value: "0000-02-03",
@@ -76,9 +73,10 @@ describe("Given I am connected as an employee", () => {
         formNewBill.addEventListener("submit", handleSubmit)
         fireEvent.submit(formNewBill)
         expect(handleSubmit).toHaveBeenCalled()
-      }
+      }*/
 
-      /* MONTANT */
+      /* MONTANT : Test apparemment inutile pour le "coverage". */
+      /*const expenseAmount = screen.getByTestId("amount")
       Object.defineProperty(expenseAmount, "value", {
         value: "",
         writable: true
@@ -103,9 +101,10 @@ describe("Given I am connected as an employee", () => {
         formNewBill.addEventListener("submit", handleSubmit)
         fireEvent.submit(formNewBill)
         expect(handleSubmit).toHaveBeenCalled()
-      }
+      }*/
 
-      /* POURCENTAGE */
+      /* POURCENTAGE : Test apparemment inutile pour le "coverage". */
+      /*const expensePourcent = screen.getByTestId("pct")
       Object.defineProperty(expensePourcent, "value", {
         value: "",
         writable: true
@@ -130,42 +129,28 @@ describe("Given I am connected as an employee", () => {
         formNewBill.addEventListener("submit", handleSubmit)
         fireEvent.submit(formNewBill)
         expect(handleSubmit).toHaveBeenCalled()
-      }
+      }*/
 
       /* UPLOAD */
+      const fileInput = screen.getByTestId("file")
       Object.defineProperty(fileInput, "files", {
-        value: "",
-        //value: new File([""], "virtual.jpg"),
+        value: new File([""], "virtual.txt", {type: "text/plain"}),
         writable: true
       })
-      if (fileInput.files == "") {
-        //console.log("Fichier manquant !")
-        expect(fileInput.files).toBeFalsy()
-        formNewBill.addEventListener("submit", handleSubmit)
-        fireEvent.submit(formNewBill)
-        expect(handleSubmit).toHaveBeenCalled()
-      }
-      /* Lignes ci-dessous à décommenter quand une valeur est présente. */
-      //const fileExt = fileInput.files.name.split(".")[1]
-      //if (fileExt !== "jpg" && fileExt !== "jpeg" && fileExt !== "png") {
-
-      /* Ligne ci-dessous à commenter quand une valeur est présente. */
-      else if (fileExt !== "jpg" && fileExt !== "jpeg" && fileExt !== "png") {
+      const fileExt = fileInput.files.name.split(".")[1]
+      if (fileExt !== "jpg" && fileExt !== "jpeg" && fileExt !== "png") {
         console.log("Extension de fichier incorrecte !")
         expect(fileInput.files).toBeTruthy()
         expect(fileInput.files.name).toBe("virtual." + fileExt)
         formNewBill.addEventListener("submit", handleSubmit)
         fireEvent.submit(formNewBill)
         expect(handleSubmit).toHaveBeenCalled()
+        /* LIGNES CI-DESSOUS A SUPPRIMER ? */
+        fileInput.addEventListener("click", handleChangeFile)
+        fireEvent.click(fileInput) // PROBLEME !!
+        // Cannot read property 'files' of null : ligne 20 fichier "containers/NewBill.js"
+        expect(handleChangeFile).toHaveBeenCalled()
       }
-    })
-  })
-  describe("When I am on NewBill Page", () => {
-    test("Then ...", () => {
-      const html = NewBillUI()
-      document.body.innerHTML = html
-      //to-do write assertion
-      // Couvrir la fonction "handleChangeFile".
     })
   })
 })
