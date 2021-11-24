@@ -8,8 +8,13 @@ import Logout from "./Logout.js"
 export const filteredBills = (data, status) => {
   return (data && data.length) ?
     data.filter(bill => {
-
       let selectCondition
+      // La regex ci-dessous concerne le format de la date.
+      let billRegex = /^\d{4}-\d{2}-\d{2}$/
+      // Si la date de la note de frais ne respecte pas la regex, la note n'est pas envoyée.
+      if (!billRegex.test(bill.date)) {
+        return false
+      }
 
       // in jest environment
       if (typeof jest !== 'undefined') {
@@ -134,20 +139,15 @@ export default class {
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
-      console.log('test1')                                             // A SUPPRIMER !!
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
-      console.log('test1b')                                             // A SUPPRIMER !!
       $(`#status-bills-container${this.index}`).html(cards(filteredBills(bills, getStatus(this.index))))
       this.counter ++
-      console.log(this.counter)                                             // A SUPPRIMER !!
     } else {
-      console.log('test2')                                             // A SUPPRIMER !!
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
       $(`#status-bills-container${this.index}`)
         .html("")
       this.counter ++
     }
-    console.log('test3')                                             // A SUPPRIMER !!
 
     bills.forEach(bill => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
