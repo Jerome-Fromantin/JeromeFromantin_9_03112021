@@ -16,22 +16,30 @@ export default class NewBill {
     new Logout({ document, localStorage, onNavigate })
   }
 
+  fileTypes = [
+    "image/jpeg",
+    "image/png"
+  ]
+  validFileType(fileType) {
+    return this.fileTypes.includes(fileType)
+  }
+
+  successPut(snapshot) {
+    return snapshot.ref.getDownloadURL()
+  }
+  /*successDwl(url) {
+    this.fileUrl = url
+    this.fileName = fileName
+  }*/
+
   handleChangeFile = e => {
-    const realFile = e.target.querySelector(`input[data-testid="file"]`).files[0]
-    //this.document, pas e.target
-    console.log(realFile)
-    const fileType = realFile.type  // Code rajouté pour récupérer le type.
+    const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+    const fileType = file.type
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    /* RAJOUT DE CODE */
-    const fileTypes = [
-      "image/jpeg",
-      "image/png"
-    ]
-    function validFileType() {
-      return fileTypes.includes(fileType)
-    }
-    if (validFileType()) {
+    console.log(filePath)
+    console.log(fileName)
+    if (this.validFileType(fileType)) {
       this.firestore
       .storage
       .ref(`justificatifs/${fileName}`)
@@ -48,7 +56,6 @@ export default class NewBill {
       this.fileName = null
       alert('Seuls les fichiers de type "jpg", "jpeg" ou "png" sont autorisés.')
     }
-    /* FIN DE RAJOUT */
   }
 
   handleSubmit = e => {
