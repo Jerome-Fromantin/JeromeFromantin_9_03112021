@@ -14,11 +14,13 @@ Travail réalisé :
 - Début de mise en place de plusieurs tests unitaires,
 - Mise en place de la validation des données dans les champs requis du formulaire "NewBill",
 - Avancement des tests "NewBill" et suppression des tests inutiles pour le "coverage",
-- Début de mise en place du test pour "Bills" (concernant le layout vertical).
+- Début de mise en place du test pour "Bills" (concernant le layout vertical),
+- Correction de quelques bugs,
+- Ajout du plan de test End 2 End du parcours "Employé" sous format PDF et OpenOffice,
+- Avancement des tests "NewBill" avec coverage à 80%.
 
 Travail à faire :
 - Corrections de code pour "Bug hunt - Dashboard",
 - Continuation des tests unitaires,
-- Mise en place de tests d'intégration,
-- Mise en place d'un plan de test End 2 End.
+- Mise en place de tests d'intégration.
 - Et d'autres choses ??
