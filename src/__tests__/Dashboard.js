@@ -73,7 +73,7 @@ describe('Given I am connected as an Admin', () => {
       icon1.addEventListener('click', handleShowTickets1)
       userEvent.click(icon1)
       expect(handleShowTickets1).toHaveBeenCalled()
-      //userEvent.click(icon1)                            // Mise en commentaire pour test.
+      //userEvent.click(icon1)                            // Mise en commentaire car non nécessaire.
 
       icon2.addEventListener('click', handleShowTickets2)
       userEvent.click(icon2)
@@ -106,8 +106,10 @@ describe('Given I am connected as an Admin', () => {
       iconEdit.addEventListener('click', handleEditTicket)
       userEvent.click(iconEdit)
       expect(handleEditTicket).toHaveBeenCalled()
+      /* Mise en commentaire car non nécessaire.
       userEvent.click(iconEdit)
       expect(handleEditTicket).toHaveBeenCalled()
+      */
     })
   })
 
@@ -232,4 +234,3 @@ describe("Given I am a user connected as Admin", () => {
     })
   })
 })
-

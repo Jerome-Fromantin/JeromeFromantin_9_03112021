@@ -9,7 +9,7 @@ export const filteredBills = (data, status) => {
   return (data && data.length) ?
     data.filter(bill => {
       let selectCondition
-      // La regex ci-dessous concerne le format de la date.
+      // La regex ci-dessous précise le format de la date qui doit être "0000-00-00".
       let billRegex = /^\d{4}-\d{2}-\d{2}$/
       // Si la date de la note de frais ne respecte pas la regex, la note n'est pas envoyée.
       if (!billRegex.test(bill.date)) {
@@ -19,12 +19,13 @@ export const filteredBills = (data, status) => {
       // in jest environment
       if (typeof jest !== 'undefined') {
         selectCondition = (bill.status === status)
-      } else {
-        // in prod environment
-        const userEmail = JSON.parse(localStorage.getItem("user")).email
-        selectCondition =
-          (bill.status === status) &&
-          [...USERS_TEST, userEmail].includes(bill.email)
+      }
+      else {
+      // in prod environment
+      const userEmail = JSON.parse(localStorage.getItem("user")).email
+      selectCondition =
+        (bill.status === status) &&
+        [...USERS_TEST, userEmail].includes(bill.email)
       }
 
       return selectCondition
@@ -36,7 +37,7 @@ export const card = (bill) => {
   const firstName = firstAndLastNames.includes('.') ?
     firstAndLastNames.split('.')[0] : ''
   const lastName = firstAndLastNames.includes('.') ?
-  firstAndLastNames.split('.')[1] : firstAndLastNames
+    firstAndLastNames.split('.')[1] : firstAndLastNames
 
   return (`
     <div class='bill-card' id='open-bill${bill.id}' data-testid='open-bill${bill.id}'>
@@ -91,17 +92,20 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
+    console.log(this.counter)         // A SUPPRIMER !
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {
       bills.forEach(b => {
-        $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
+      $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
       })
       $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(bill))
       $('.vertical-navbar').css({ height: '150vh' })
       this.counter ++
-    } else {
+    }
+    // PARTIE A SUPPRIMER POUR CORRIGER LE BUG.
+    /*else {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
       $('.dashboard-right-container div').html(`
@@ -109,7 +113,7 @@ export default class {
       `)
       $('.vertical-navbar').css({ height: '120vh' })
       this.counter ++
-    }
+    }*/
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
     $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, bill))
