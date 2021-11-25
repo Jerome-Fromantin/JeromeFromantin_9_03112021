@@ -16,8 +16,15 @@ const row = (bill) => {
         ${Actions(bill.fileUrl)}
       </td>
     </tr>
-    `)
-  }
+    `
+  )
+}
+
+/* SYNTAXE ORIGINALE AVEC BUG.
+const rows = (data) => {
+  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+}
+*/
 
 const antichrono = (a, b) => ((a.date < b.date) ? 1 : -1);
 const rows = (data) => {
