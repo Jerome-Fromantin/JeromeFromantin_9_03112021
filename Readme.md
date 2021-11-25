@@ -17,10 +17,11 @@ Travail réalisé :
 - Début de mise en place du test pour "Bills" (concernant le layout vertical),
 - Correction de quelques bugs,
 - Ajout du plan de test End 2 End du parcours "Employé" sous format PDF et OpenOffice,
-- Avancement des tests "NewBill" avec coverage à 80%.
+- Avancement des tests "NewBill" avec coverage à 80%,
+- 4ème correction de code (Bug hunt - Dashboard).
 
 Travail à faire :
-- Corrections de code pour "Bug hunt - Dashboard",
+- Améliorations éventuelles du "Bug hunt - Dashboard",
 - Continuation des tests unitaires,
 - Mise en place de tests d'intégration.
 - Et d'autres choses ??
