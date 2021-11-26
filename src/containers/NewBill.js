@@ -37,8 +37,6 @@ export default class NewBill {
     const fileType = file.type
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
-    console.log(filePath)
-    console.log(fileName)
     if (this.validFileType(fileType)) {
       this.firestore
       .storage

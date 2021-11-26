@@ -19,7 +19,7 @@ describe("Given I am connected as an employee", () => {
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
-            email: "jeromefromantin@hotmail.fr"
+            email: "charles-atan@hotmail.fr"
           }
           return JSON.stringify(currentUser)
         }
@@ -70,7 +70,7 @@ describe("Given I am connected as an employee", () => {
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
-            email: "jeromefromantin@hotmail.fr"
+            email: "charles-atan@hotmail.fr"
           }
           return JSON.stringify(currentUser)
         }
@@ -132,7 +132,7 @@ describe("Given I am connected as an employee", () => {
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
-            email: "jeromefromantin@hotmail.fr"
+            email: "charles-atan@hotmail.fr"
           }
           return JSON.stringify(currentUser)
         }
