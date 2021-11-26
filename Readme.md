@@ -18,7 +18,8 @@ Travail réalisé :
 - Correction de quelques bugs,
 - Ajout du plan de test End 2 End du parcours "Employé" sous format PDF et OpenOffice,
 - Avancement des tests "NewBill" avec coverage à 80%,
-- 4ème correction de code (Bug hunt - Dashboard).
+- 4ème correction de code (Bug hunt - Dashboard),
+- Début de mise en place d'un test d'intégration.
 
 Travail à faire :
 - Améliorations éventuelles du "Bug hunt - Dashboard",
