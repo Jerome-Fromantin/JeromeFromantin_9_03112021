@@ -3,6 +3,7 @@ import BillsUI from "../views/BillsUI.js"
 import VerticalLayout from '../views/VerticalLayout.js' // Ajout de code.
 import { bills } from "../fixtures/bills.js"
 import Router from "../app/Router.js"
+import firebase from "../__mocks__/firebase"
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -13,13 +14,15 @@ describe("Given I am connected as an employee", () => {
       "Il faut mocker les données, et le localstorage, pour pouvoir appeler la fonction Router() qui
       s'occupe de charger le projet, et ensuite, vous aurez la classe voulue..."
       */
-      const html = VerticalLayout()
+      const VerticalBar = jest.fn(VerticalLayout())
+      
+      const html = VerticalBar
       document.body.innerHTML = html
 
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
-            email: "jeromefromantin@hotmail.fr"
+            email: "charles-atan@hotmail.fr"
           }
           return JSON.stringify(currentUser)
         }
@@ -34,8 +37,6 @@ describe("Given I am connected as an employee", () => {
         writable: true
       })
 
-      const VerticalLayout = jest.fn(VerticalLayout())
-      
       let user = JSON.parse(localStorage.getItem('user'))
       if (typeof user.email === 'string') {
         console.log("Oui !")
@@ -44,11 +45,15 @@ describe("Given I am connected as an employee", () => {
       }
       user.type = "Employee"
       if (user && user.type === 'Employee') {
+        //const VerticalBar = jest.fn(VerticalLayout())
+        const html = VerticalLayout()
+        document.body.innerHTML = html
+
         console.log("Tu y es presque !")
-        expect(VerticalLayout).toReturn()
+        //const windowIcon = screen.getByTestId("icon-window")
+        //expect(windowIcon).toBeVisible()
+        //expect(VerticalLayout).toHaveBeenCalled()
       }
-      const windowIcon = screen.getByTestId("icon-window")
-      expect(windowIcon).toBeVisible()
     })
     test("Then bills should be ordered from earliest to latest", () => {
       const html = BillsUI({ data: bills })
@@ -57,6 +62,39 @@ describe("Given I am connected as an employee", () => {
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
+    })
+  })
+})
+
+
+
+// Modèle de test d'intégration GET à modifier pour réaliser GET Bills...
+// Note : Modification commencée...
+describe("Given I am connected as an employee", () => {
+  describe("When I am on Bills Page", () => {
+    test("Then... fetches bills from mock API GET", async () => {
+       const getSpy = jest.spyOn(firebase, "get")
+       const bills = await firebase.get()
+       expect(getSpy).toHaveBeenCalledTimes(1)
+       expect(bills.data.length).toBe(4)
+    })
+    test("fetches bills from an API and fails with 404 message error", async () => {
+      firebase.get.mockImplementationOnce(() =>
+        Promise.reject(new Error("Erreur 404"))
+      )
+      const html = DashboardUI({ error: "Erreur 404" })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 404/)
+      expect(message).toBeTruthy()
+    })
+    test("fetches messages from an API and fails with 500 message error", async () => {
+      firebase.get.mockImplementationOnce(() =>
+        Promise.reject(new Error("Erreur 500"))
+      )
+      const html = DashboardUI({ error: "Erreur 500" })
+      document.body.innerHTML = html
+      const message = await screen.getByText(/Erreur 500/)
+      expect(message).toBeTruthy()
     })
   })
 })
