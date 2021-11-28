@@ -1,9 +1,15 @@
-import { screen } from "@testing-library/dom"
+/**
+* @jest-environment jsdom
+*/
+// Le commentaire ci-dessus est nécessaire pour que Jest comprenne que le test d'intégration
+// présent plus bas se fait dans l'environnement du DOM.
+
+import { screen, getByTestId } from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
-import VerticalLayout from '../views/VerticalLayout.js' // Ajout de code.
+import VerticalLayout from '../views/VerticalLayout.js'
 import { bills } from "../fixtures/bills.js"
 import Router from "../app/Router.js"
-import firebase from "../__mocks__/firebase"
+import { ROUTES_PATH } from "../constants/routes.js"
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -14,15 +20,11 @@ describe("Given I am connected as an employee", () => {
       "Il faut mocker les données, et le localstorage, pour pouvoir appeler la fonction Router() qui
       s'occupe de charger le projet, et ensuite, vous aurez la classe voulue..."
       */
-      const VerticalBar = jest.fn(VerticalLayout())
-      
-      const html = VerticalBar
-      document.body.innerHTML = html
-
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
-            email: "charles-atan@hotmail.fr"
+            email: "charles-atan@hotmail.fr",
+            type: "Employee"
           }
           return JSON.stringify(currentUser)
         }
@@ -37,24 +39,24 @@ describe("Given I am connected as an employee", () => {
         writable: true
       })
 
-      let user = JSON.parse(localStorage.getItem('user'))
-      if (typeof user.email === 'string') {
-        console.log("Oui !")
-        console.log(user)
-        //user = JSON.parse(user)
-      }
-      user.type = "Employee"
-      if (user && user.type === 'Employee') {
-        //const VerticalBar = jest.fn(VerticalLayout())
-        const html = VerticalLayout()
-        document.body.innerHTML = html
+      Object.defineProperty(window, "location", {
+        value: {pathname: ROUTES_PATH['Bills']},
+        writable: true
+      })
 
-        console.log("Tu y es presque !")
-        //const windowIcon = screen.getByTestId("icon-window")
-        //expect(windowIcon).toBeVisible()
-        //expect(VerticalLayout).toHaveBeenCalled()
-      }
+      let user = JSON.parse(localStorage.getItem('user'))
+
+      const html = BillsUI([])
+      document.body.innerHTML = '<div id="root"></div>'
+      Router()
+      //window.onNavigate(ROUTES_PATH['Bills'])
+
+      const windowIcon = screen.getByTestId("icon-window")
+      console.log(windowIcon.classList)
+      
+      //expect(windowIcon.classList.contains("active-icon")).toBeTruthy()
     })
+
     test("Then bills should be ordered from earliest to latest", () => {
       const html = BillsUI({ data: bills })
       document.body.innerHTML = html
@@ -70,7 +72,7 @@ describe("Given I am connected as an employee", () => {
 
 // Modèle de test d'intégration GET à modifier pour réaliser GET Bills...
 // Note : Modification commencée...
-describe("Given I am connected as an employee", () => {
+/*describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then... fetches bills from mock API GET", async () => {
        const getSpy = jest.spyOn(firebase, "get")
@@ -97,4 +99,4 @@ describe("Given I am connected as an employee", () => {
       expect(message).toBeTruthy()
     })
   })
-})
+})*/
