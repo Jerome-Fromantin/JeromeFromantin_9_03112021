@@ -20,6 +20,7 @@ export default class NewBill {
     "image/jpeg",
     "image/png"
   ]
+
   validFileType(fileType) {
     return this.fileTypes.includes(fileType)
   }
@@ -27,32 +28,31 @@ export default class NewBill {
   successPut(snapshot) {
     return snapshot.ref.getDownloadURL()
   }
-  /*successDwl(url) {
+
+  successDwl(url, fileName) {
     this.fileUrl = url
     this.fileName = fileName
-  }*/
+  }
 
   handleChangeFile = e => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const fileType = file.type
     const filePath = e.target.value.split(/\\/g)
-    const fileName = filePath[filePath.length-1]
+    this.fileName = filePath[filePath.length-1]
+    
     if (this.validFileType(fileType)) {
       this.firestore
       .storage
-      .ref(`justificatifs/${fileName}`)
+      .ref(`justificatifs/${this.fileName}`)
       .put(file)
-      .then(snapshot => snapshot.ref.getDownloadURL())
-      .then(url => {
-        this.fileUrl = url
-        this.fileName = fileName
-      })
+      .then(this.successPut)
+      .then(this.successDwl)
     }
     else {
       document.querySelector(`input[data-testid="file"]`).value = null
       this.fileUrl = null
       this.fileName = null
-      alert('Seuls les fichiers de type "jpg", "jpeg" ou "png" sont autorisés.')
+      window.alert('Seuls les fichiers de type "jpg", "jpeg" ou "png" sont autorisés.')
     }
   }
 

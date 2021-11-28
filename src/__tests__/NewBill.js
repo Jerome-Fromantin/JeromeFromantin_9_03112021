@@ -2,11 +2,11 @@ import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
 import { ROUTES } from "../constants/routes"
 import { fireEvent, screen } from "@testing-library/dom"
-import "@testing-library/jest-dom"
 
 describe("Given I am connected as an employee", () => {
-  describe("When I am on NewBill Page and I upload a file", () => {
-    test("Then the file type should be verified and the file rejected if not valid.", () => {
+  describe("When I am on NewBill Page and I submit a new bill", () => {
+    test("Then the function to manage it is called", () => {
+      // Définition des paramètres de la ligne 37.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -38,34 +38,23 @@ describe("Given I am connected as an employee", () => {
       nouvelleNote.createBill = jest.fn()
 
       const formNewBill = screen.getByTestId("form-new-bill")
-      //const handleChangeFile = jest.fn(nouvelleNote.handleChangeFile) // ???
+
       const handleSubmit = jest.fn(nouvelleNote.handleSubmit)
-      //const validFileType = jest.fn(validFileType) // ???
 
       formNewBill.addEventListener("submit", handleSubmit)
       fireEvent.submit(formNewBill)
+
       expect(handleSubmit).toHaveBeenCalled()
     })
   })
 
-  describe("When I am on NewBill Page and I upload a file", () => {
-    test("Then ...", () => {
+  describe("When I am on NewBill Page and I upload an invalid file", () => {
+    test("Then the functions to manage it are called", () => {
+      // Définition des paramètres de la ligne 100.
       const html = NewBillUI()
       document.body.innerHTML = html
 
-      const fileInput = screen.getByTestId("file")
-      Object.defineProperty(fileInput, "files", {
-        value: [new File([""], "virtual.txt", {type: "text/plain"})],
-        writable: true
-      })
-      
-      /*Object.defineProperty(fileInput, "value", {
-        value: "virtual.txt",
-        writable: true
-      })*/
-      /*const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }*/
+      const firestore = jest.fn()
 
       function getCurrentUser(user) {
         if (user == "user") {
@@ -85,7 +74,21 @@ describe("Given I am connected as an employee", () => {
         writable: true
       })
 
-      const firestore = jest.fn()
+      // Crée un fichier virtuel avec une extension non valide.
+      const fileInput = screen.getByTestId("file")
+      Object.defineProperty(fileInput, "files", {
+        value: [new File([""], "virtual.txt", {type: "text/plain"})],
+        writable: true
+      })
+
+      // Mocke la boite d'alerte pour les fichiers non valides.
+      const alertMock = jest.fn()
+      Object.defineProperty(window, "alert", {
+        value: alertMock,
+        writable: true
+      })
+
+      // Mocke la fonction stockant le nom de fichier quand il est valide.
       const refMock = jest.fn()
       Object.defineProperty(firestore, "storage", {
         value: {
@@ -100,34 +103,24 @@ describe("Given I am connected as an employee", () => {
       const handleChangeFile = jest.fn(nouvelleNote.handleChangeFile)
 
       fileInput.addEventListener("change", handleChangeFile)
-      fireEvent.change(fileInput, {
-        target: {
-          value: ""
-        }
-      })
+      fireEvent.change(fileInput)
+
+      // Appelle la fonction qui gère l'upload du fichier.
       expect(handleChangeFile).toHaveBeenCalled()
+      // Fichier invalide donc appelle la boite d'alerte.
+      expect(alertMock).toHaveBeenCalled()
+      // Fichier invalide donc n'appelle pas la fonction de stockage.
       expect(refMock).not.toHaveBeenCalled()
     })
   })
 
-  describe("When I am on NewBill Page and I upload a file", () => {
-    test("Then ...", () => {
+  describe("When I am on NewBill Page and I upload a valid file", () => {
+    test("Then the functions to manage it are called", () => {
+      // Définition des paramètres de la ligne 157.
       const html = NewBillUI()
       document.body.innerHTML = html
 
-      const fileInput = screen.getByTestId("file")
-      Object.defineProperty(fileInput, "files", {
-        value: [new File([""], "virtual.jpg", {type: "image/jpeg"})],
-        writable: true
-      })
-      
-      /*Object.defineProperty(fileInput, "value", {
-        value: "virtual.txt",
-        writable: true
-      })*/
-      /*const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }*/
+      const firestore = jest.fn()
 
       function getCurrentUser(user) {
         if (user == "user") {
@@ -147,13 +140,17 @@ describe("Given I am connected as an employee", () => {
         writable: true
       })
 
-      const firestore = jest.fn()
-      const successDwl = jest.fn((url) => url)
-      const snapshot = jest.fn()
-      Object.defineProperty(snapshot, "ref", {
-        value: {
-          getDownloadURL: jest.fn(() => new Promise(successDwl))
-        },
+      // Crée un fichier virtuel avec une extension valide.
+      const fileInput = screen.getByTestId("file")
+      Object.defineProperty(fileInput, "files", {
+        value: [new File([""], "virtual.jpg", {type: "image/jpeg"})],
+        writable: true
+      })
+
+      // Mocke la boite d'alerte pour les fichiers non valides.
+      const alertMock = jest.fn()
+      Object.defineProperty(window, "alert", {
+        value: alertMock,
         writable: true
       })
 
@@ -162,12 +159,29 @@ describe("Given I am connected as an employee", () => {
 
       const handleChangeFile = jest.fn(nouvelleNote.handleChangeFile)
 
-      const firstThen = jest.fn(() => snapshot)
-      //nouvelleNote.successPut = firstThen
-      const resolveMock = jest.fn(() => snapshot)
+      // Mocke la fonction successPut du container ligne 28 à 30.
+      const successPut = jest.fn(nouvelleNote.successPut)
+      
+      // Mocke la fonction successDwl du container ligne 32 à 35.
+      const successDwl = jest.fn(nouvelleNote.successDwl)
+
+      const snapshot = jest.fn()
+      Object.defineProperty(snapshot, "ref", {
+        value: {
+          getDownloadURL: jest.fn(() => new Promise(successDwl))
+        },
+        writable: true
+      })
+
+      const resolveProm = new Promise(jest.fn())
+      resolveProm.then = successDwl
+
+      const resolveMock = jest.fn(() => resolveProm)
       const rejectMock = jest.fn()
-      const promise = new Promise(resolveMock, rejectMock)
+
+      const promise = new Promise(successPut, rejectMock)
       promise.then = resolveMock
+
       const putMock = jest.fn((file) => promise)
       const refMock = jest.fn((fileName) => ({put: putMock}))
       Object.defineProperty(firestore, "storage", {
@@ -188,8 +202,10 @@ describe("Given I am connected as an employee", () => {
       expect(refMock).toHaveBeenCalled()
       expect(putMock).toHaveBeenCalled()
       expect(resolveMock).toHaveBeenCalled()
+      expect(rejectMock).not.toHaveBeenCalled()
+      expect(successPut).toHaveBeenCalled()
       expect(successDwl).toHaveBeenCalled()
-      //expect(firstThen).toHaveBeenCalled()
+      expect(alertMock).not.toHaveBeenCalled()
     })
   })
 })
