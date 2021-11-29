@@ -19,7 +19,7 @@ Travail réalisé :
 - Ajout du plan de test End 2 End du parcours "Employé" sous format PDF et OpenOffice,
 - Avancement des tests "NewBill" avec coverage à 80%,
 - 4ème correction de code (Bug hunt - Dashboard),
-- Début de mise en place d'un test d'intégration,
+- Début de mise en place d'un test d'intégration (pour "Bills"),
 - Finition des tests "NewBill" avec coverage à plus de 80%,
 - Avancement du test unitaire "Bills".
 
