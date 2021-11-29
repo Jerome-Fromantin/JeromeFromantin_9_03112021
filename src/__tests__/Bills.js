@@ -9,7 +9,10 @@ import BillsUI from "../views/BillsUI.js"
 import VerticalLayout from '../views/VerticalLayout.js'
 import { bills } from "../fixtures/bills.js"
 import Router from "../app/Router.js"
-import { ROUTES_PATH } from "../constants/routes.js"
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
+import LoadingPage from "../views/LoadingPage.js"
+import firebase from "../__mocks__/firebase"
+import DashboardUI from "../views/DashboardUI.js"
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -40,21 +43,21 @@ describe("Given I am connected as an employee", () => {
       })
 
       Object.defineProperty(window, "location", {
-        value: {pathname: ROUTES_PATH['Bills']},
+        value: { pathname: ROUTES_PATH['Bills'] },
         writable: true
       })
 
-      let user = JSON.parse(localStorage.getItem('user'))
+      //let user = JSON.parse(localStorage.getItem('user'))
 
-      const html = BillsUI([])
+      //const html = VerticalLayout()
       document.body.innerHTML = '<div id="root"></div>'
+      //document.body.innerHTML = ROUTES({ pathname: window.location.pathname })
       Router()
-      //window.onNavigate(ROUTES_PATH['Bills'])
-
+      console.log(window.location.pathname) // #employee/bills
       const windowIcon = screen.getByTestId("icon-window")
-      console.log(windowIcon.classList)
-      
+      console.log(windowIcon.classList.contains("active-icon")) // false
       //expect(windowIcon.classList.contains("active-icon")).toBeTruthy()
+      //window.onNavigate(ROUTES_PATH['Bills'])
     })
 
     test("Then bills should be ordered from earliest to latest", () => {
@@ -68,19 +71,34 @@ describe("Given I am connected as an employee", () => {
   })
 })
 
+describe('Given I am connected on app (as an Employee or an HR admin)', () => {
+  describe('When LoadingPage is called', () => {
+    test(('Then it should render Loading...'), () => {
+      const html = LoadingPage()
+      document.body.innerHTML = html
+      expect(screen.getAllByText('Loading...')).toBeTruthy()
+
+      /*if (loading) {
+        expect(BillsUI).toReturn()
+      } else if (error) {
+        expect(BillsUI).toReturn()
+      }*/
+    })
+  })
+})
 
 
-// Modèle de test d'intégration GET à modifier pour réaliser GET Bills...
-// Note : Modification commencée...
-/*describe("Given I am connected as an employee", () => {
+
+// Test d'intégration GET modifié depuis le modèle de Dashboard...
+describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
-    test("Then... fetches bills from mock API GET", async () => {
+    test("Then it should fetch bills from mock API GET", async () => {
        const getSpy = jest.spyOn(firebase, "get")
        const bills = await firebase.get()
        expect(getSpy).toHaveBeenCalledTimes(1)
        expect(bills.data.length).toBe(4)
     })
-    test("fetches bills from an API and fails with 404 message error", async () => {
+    test("Then it should fetch bills from an API and fail with 404 message error", async () => {
       firebase.get.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 404"))
       )
@@ -89,7 +107,7 @@ describe("Given I am connected as an employee", () => {
       const message = await screen.getByText(/Erreur 404/)
       expect(message).toBeTruthy()
     })
-    test("fetches messages from an API and fails with 500 message error", async () => {
+    test("Then it should fetch bills from an API and fail with 500 message error", async () => {
       firebase.get.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 500"))
       )
@@ -99,4 +117,4 @@ describe("Given I am connected as an employee", () => {
       expect(message).toBeTruthy()
     })
   })
-})*/
+})
