@@ -8,6 +8,6 @@ export default () => {
       <div class='content' id='loading'>
         Loading...
       </div>
-    </div>`
-  )
+    </div>
+  `)
 }
