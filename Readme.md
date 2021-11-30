@@ -21,7 +21,8 @@ Travail réalisé :
 - 4ème correction de code (Bug hunt - Dashboard),
 - Début de mise en place d'un test d'intégration (pour "Bills"),
 - Finition des tests "NewBill" avec coverage à plus de 80%,
-- Avancement du test unitaire "Bills".
+- Avancement du test unitaire "Bills",
+- Coverage de 100% pour le fichier "views/BillsUI.js".
 
 Travail à faire :
 - Améliorations éventuelles du "Bug hunt - Dashboard",
