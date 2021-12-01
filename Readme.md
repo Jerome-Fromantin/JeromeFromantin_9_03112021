@@ -14,7 +14,7 @@ Travail réalisé :
 - Début de mise en place de plusieurs tests unitaires,
 - Mise en place de la validation des données dans les champs requis du formulaire "NewBill",
 - Avancement des tests "NewBill" et suppression des tests inutiles pour le "coverage",
-- Début de mise en place du test pour "Bills" (concernant le layout vertical),
+- Début de mise en place du test unitaire pour "Bills" (concernant le layout vertical),
 - Correction de quelques bugs,
 - Ajout du plan de test End 2 End du parcours "Employé" sous format PDF et OpenOffice,
 - Avancement des tests "NewBill" avec coverage à 80%,
@@ -22,10 +22,11 @@ Travail réalisé :
 - Début de mise en place d'un test d'intégration (pour "Bills"),
 - Finition des tests "NewBill" avec coverage à plus de 80%,
 - Avancement du test unitaire "Bills",
-- Coverage de 100% pour le fichier "views/BillsUI.js".
+- Coverage de 100% pour le fichier "views/BillsUI.js",
+- Finition du test d'intégration "Bills".
 
 Travail à faire :
 - Améliorations éventuelles du "Bug hunt - Dashboard",
 - Continuation des tests unitaires,
-- Mise en place de tests d'intégration.
+- Mise en place d'un deuxième test d'intégration.
 - Et d'autres choses ??
