@@ -5,6 +5,7 @@
 // présent plus bas se fait dans l'environnement du DOM.
 
 import { screen } from "@testing-library/dom"
+import "@testing-library/jest-dom" // Utilisé lignes 99/112/113/126/127
 
 import { bills } from "../fixtures/bills.js"
 import BillsUI from "../views/BillsUI.js"
@@ -30,8 +31,8 @@ describe("Given I am connected as an employee", () => {
     })
   
     test("Then bill icon in vertical layout should be highlighted", () => {
-      // Pour vérifier que l'icône concernée est bien surlignée, il faut s'assurer que son conteneur,
-      // qui est la <div id='layout-icon1'>, a aussi la classe "active-icon".
+      // Pour vérifier que l'icône concernée est bien surlignée, il faut s'assurer
+      // que son conteneur, qui est la <div id='layout-icon1'>, a aussi la classe "active-icon".
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
@@ -93,7 +94,9 @@ describe("Given I am connected on app (as an Employee or an HR admin)", () => {
     test(("Then it should render Loading..."), () => {
       const html = BillsUI({ loading: true })
       document.body.innerHTML = html
+
       expect(screen.getAllByText("Loading...")).toBeTruthy()
+      expect(screen.getByText("Loading...")).toBeInTheDocument()
     })
   })
 
@@ -102,8 +105,12 @@ describe("Given I am connected on app (as an Employee or an HR admin)", () => {
       const error = ""
       const html = BillsUI({ error: true })
       document.body.innerHTML = html
+      const loadingPart = document.getElementById("loading")
+
       expect(screen.getAllByText("Erreur")).toBeTruthy()
       expect(error.length).toBe(0)
+      expect(loadingPart).not.toBeInTheDocument()
+      expect(screen.getByText("Erreur")).toBeInTheDocument()
     })
   })
 
@@ -112,8 +119,12 @@ describe("Given I am connected on app (as an Employee or an HR admin)", () => {
       const error = "Erreur de connexion internet"
       const html = BillsUI({ error: error })
       document.body.innerHTML = html
+      const loadingPart = document.getElementById("loading")
+
       expect(screen.getAllByText("Erreur")).toBeTruthy()
       expect(screen.getAllByText(error)).toBeTruthy()
+      expect(loadingPart).not.toBeInTheDocument()
+      expect(screen.getByText("Erreur")).toBeInTheDocument()
     })
   })
 })
