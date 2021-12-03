@@ -1,12 +1,14 @@
-import NewBillUI from "../views/NewBillUI.js"
 import NewBill from "../containers/NewBill.js"
+import NewBillUI from "../views/NewBillUI.js"
 import { ROUTES } from "../constants/routes"
+import bills from "../fixtures/bills"
+import firestore from "../app/Firestore.js"
 import { fireEvent, screen } from "@testing-library/dom"
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on NewBill Page and I submit a new bill", () => {
     test("Then the function to manage it is called", () => {
-      // Définition des paramètres de la ligne 37.
+      // Définition des paramètres de la ligne 39.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -50,7 +52,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on NewBill Page and I upload an invalid file", () => {
     test("Then the functions to manage it are called", () => {
-      // Définition des paramètres de la ligne 100.
+      // Définition des paramètres de la ligne 102.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -116,7 +118,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on NewBill Page and I upload a valid file", () => {
     test("Then the functions to manage it are called", () => {
-      // Définition des paramètres de la ligne 157.
+      // Définition des paramètres de la ligne 159.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -209,3 +211,32 @@ describe("Given I am connected as an employee", () => {
     })
   })
 })
+
+// Test d'intégration POST à modifier.
+describe("Given I am connected as an employee", () => {
+  describe("When I am on NewBill Page and I submit a bill", () => {
+    test("Then it should add a bill", () => {
+      jest.mock("../app/Firestore.js")
+      const mockBills = jest.fn(() => {
+        return {
+          add: jest.fn().mockResolvedValue()
+        }
+      })
+      //faire mock de navigate et vérifier appelé
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+      firestore.bills = mockBills
+      const nouveau = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
+      nouveau.createBill() //bill en paramètre
+
+      expect(firestore.bills).toHaveBeenCalled()
+    })
+  })
+})
+
+/*
+Ouais pour les test d'intégration, pour le get tu check juste si déjà les bonnes fonctions sont
+appelées et si tu recup bien les data que tu attends ( les data mockées dans les fixtures en gros)
+pour le post tu check juste si les bonnes fonctions sont appelées avec les bons paramètres
+*/
