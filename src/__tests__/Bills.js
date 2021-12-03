@@ -4,16 +4,19 @@
 // Le commentaire ci-dessus est nécessaire pour que Jest comprenne que le test d'intégration
 // présent plus bas se fait dans l'environnement du DOM.
 
-import { screen } from "@testing-library/dom"
-import "@testing-library/jest-dom" // Utilisé lignes 99/112/113/126/127
+import { fireEvent, screen } from "@testing-library/dom"
+import "@testing-library/jest-dom" // Utilisé avec ".toBeInTheDocument()".
 
+import Bills from "../containers/Bills.js"
 import { bills } from "../fixtures/bills.js"
 import BillsUI from "../views/BillsUI.js"
 
 import firebase from "../__mocks__/firebase"
-//import firestore from "../app/Firestore.js"
+import firestore from "../app/Firestore.js"
 import Router from "../app/Router.js"
-import { ROUTES_PATH } from "../constants/routes.js"
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
+
+jest.mock("../app/Firestore.js")
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -33,6 +36,12 @@ describe("Given I am connected as an employee", () => {
     test("Then bill icon in vertical layout should be highlighted", () => {
       // Pour vérifier que l'icône concernée est bien surlignée, il faut s'assurer
       // que son conteneur, qui est la <div id='layout-icon1'>, a aussi la classe "active-icon".
+      const mockBills = jest.fn(() => {
+        return {
+          get: jest.fn().mockResolvedValue(bills)
+        }
+      })
+      firestore.bills = mockBills
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
@@ -54,7 +63,7 @@ describe("Given I am connected as an employee", () => {
 
       Object.defineProperty(window, "location", {
         value: {
-          //hash: ROUTES_PATH["Bills"],
+          hash: ROUTES_PATH["Bills"],
           pathname: ROUTES_PATH["Bills"]
          },
         writable: true
@@ -67,15 +76,10 @@ describe("Given I am connected as an employee", () => {
       RouterMock()
 
       const windowIcon = screen.getByTestId("icon-window")
-      windowIcon.classList.add("active-icon")
-      // Avec la ligne ci-dessus, les tests passent, mais c'est de la triche
-      // puisque RouterMock est censé le faire...
 
       expect(RouterMock).toHaveBeenCalled()
       expect(windowIcon.classList.contains("active-icon")).toBeTruthy()
       expect(FirestoreMock).not.toHaveBeenCalled();
-      const FirestoreInstance = new FirestoreMock()
-      expect(FirestoreMock).toHaveBeenCalledTimes(1);
     })
 
     test("Then bills should be ordered from earliest to latest", () => {
@@ -129,6 +133,114 @@ describe("Given I am connected on app (as an Employee or an HR admin)", () => {
   })
 })
 
+describe("Given I am connected as an employee", () => {
+  describe("When I am on Bills Page and I click on 'New Bill' button", () => {
+    test("Then, it should render 'New Bill' Page", () => {
+      // Définition des paramètres de "new Bills".
+      const html = BillsUI({ data: bills })
+      document.body.innerHTML = html
+  
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+  
+      const firestore = jest.fn()
+  
+      function getCurrentUser(user) {
+        if (user == "user") {
+          const currentUser = {
+            email: "charles-atan@hotmail.fr"
+          }
+          return JSON.stringify(currentUser)
+        }
+        return null
+      }
+  
+      Object.defineProperty(window, "localStorage", {
+        value: {
+          getItem: jest.fn(getCurrentUser),
+          setItem: jest.fn(() => null)
+        },
+        writable: true
+      })
+  
+      const nouvelleNote = new Bills({ document, onNavigate, firestore, localStorage: window.localStorage })
+      nouvelleNote.createBill = jest.fn()
+
+      const buttonNewBill = screen.getByTestId("btn-new-bill")
+
+      const handleClickNewBill = jest.fn(nouvelleNote.handleClickNewBill)
+
+      buttonNewBill.addEventListener("click", handleClickNewBill)
+      fireEvent.click(buttonNewBill)
+
+      expect(handleClickNewBill).toHaveBeenCalled()
+    })
+  })
+})
+
+describe("Given I am connected as an employee", () => {
+  describe("When I am on Bills Page and I click on an eye icon", () => {
+    test("Then, it should render the modal of the selected bill", () => {
+      // Définition des paramètres de "new Bills".
+      const html = BillsUI({ data: bills })
+      document.body.innerHTML = html
+  
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+  
+      const firestore = jest.fn()
+  
+      function getCurrentUser(user) {
+        if (user == "user") {
+          const currentUser = {
+            email: "charles-atan@hotmail.fr"
+          }
+          return JSON.stringify(currentUser)
+        }
+        return null
+      }
+  
+      Object.defineProperty(window, "localStorage", {
+        value: {
+          getItem: jest.fn(getCurrentUser),
+          setItem: jest.fn(() => null)
+        },
+        writable: true
+      })
+  
+      const nouvelleNote = new Bills({ document, onNavigate, firestore, localStorage: window.localStorage })
+      nouvelleNote.createBill = jest.fn()
+
+      const iconEye = screen.getAllByTestId("icon-eye")
+
+      const mockFind = jest.fn(() => {
+        return {
+          html: jest.fn()
+        }
+      })
+
+      $ = () => {
+        return {
+          find: mockFind,
+          modal: jest.fn(),
+          width: jest.fn()
+        }
+      }
+
+      const handleClickIconEye = jest.fn(nouvelleNote.handleClickIconEye)
+
+      iconEye.forEach(icon => {
+        icon.addEventListener("click", (e) => handleClickIconEye(icon))
+      })
+      fireEvent.click(iconEye[0])
+
+      expect(handleClickIconEye).toHaveBeenCalled()
+    })
+  })
+})
+
 // Test d'intégration.
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -158,9 +270,3 @@ describe("Given I am connected as an employee", () => {
     })
   })
 })
-
-/*
-Ouais pour les test d'intégration, pour le get tu check juste si déjà les bonnes fonctions sont
-appelées et si tu recup bien les data que tu attends ( les data mockées dans les fixtures en gros)
-pour le post tu check juste si les bonnes fonctions sont appelées avec les bons paramètres
-*/
