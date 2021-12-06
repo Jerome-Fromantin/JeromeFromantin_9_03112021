@@ -16,32 +16,19 @@ import firestore from "../app/Firestore.js"
 import Router from "../app/Router.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js"
 
-jest.mock("../app/Firestore.js")
-
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
-    const FirestoreMock = jest.fn(() => {
-      return {
-        collection: () => firebase
-      }
-    })
-
-    Object.defineProperty(window, "firebase", {
-      value: {
-        firestore: FirestoreMock
-       },
-      writable: true
-    })
-  
     test("Then bill icon in vertical layout should be highlighted", () => {
       // Pour vérifier que l'icône concernée est bien surlignée, il faut s'assurer
-      // que son conteneur, qui est la <div id='layout-icon1'>, a aussi la classe "active-icon".
+      // que son conteneur, qui est la <div data-testid="icon-window">,
+      // a aussi la classe CSS "active-icon".
       const mockBills = jest.fn(() => {
         return {
           get: jest.fn().mockResolvedValue(bills)
         }
       })
       firestore.bills = mockBills
+      
       function getCurrentUser(user) {
         if (user == "user") {
           const currentUser = {
@@ -79,7 +66,6 @@ describe("Given I am connected as an employee", () => {
 
       expect(RouterMock).toHaveBeenCalled()
       expect(windowIcon.classList.contains("active-icon")).toBeTruthy()
-      expect(FirestoreMock).not.toHaveBeenCalled();
     })
 
     test("Then bills should be ordered from earliest to latest", () => {
@@ -87,7 +73,13 @@ describe("Given I am connected as an employee", () => {
       document.body.innerHTML = html
       const dates = screen.getAllByText(/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML)
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
+      // Explication de la fonction ci-dessus avec opérateur ternaire :
+      // Entre une date a et une date b, si la première est inférieure à la deuxième (donc plus vieille),
+      // cela retourne la valeur "1" et donc b est rangée avant a.
+      // Sinon, donc si la première est supérieure à la deuxième (et donc plus récente),
+      // cela retourne la valeur "-1" et donc a est rangée avant b.
       const datesSorted = [...dates].sort(antiChrono)
+      // Ainsi, les dates sont rangées de la plus récente à la plus vieille.
       expect(dates).toEqual(datesSorted)
     })
   })
@@ -223,9 +215,9 @@ describe("Given I am connected as an employee", () => {
 
       $ = () => {
         return {
+          width: jest.fn(),
           find: mockFind,
-          modal: jest.fn(),
-          width: jest.fn()
+          modal: jest.fn()
         }
       }
 
@@ -250,22 +242,22 @@ describe("Given I am connected as an employee", () => {
        expect(getSpy).toHaveBeenCalledTimes(1)
        expect(bills.data.length).toBe(4)
     })
-    test("Then it should fetch bills from an API and fail with 404 message error", async () => {
+    test("Then it should fetch bills from an API and fail with 404 message error", () => {
       firebase.get.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 404"))
       )
       const html = BillsUI({ error: "Erreur 404" })
       document.body.innerHTML = html
-      const message = await screen.getByText(/Erreur 404/)
+      const message = screen.getByText("Erreur 404")
       expect(message).toBeTruthy()
     })
-    test("Then it should fetch bills from an API and fail with 500 message error", async () => {
+    test("Then it should fetch bills from an API and fail with 500 message error", () => {
       firebase.get.mockImplementationOnce(() =>
         Promise.reject(new Error("Erreur 500"))
       )
       const html = BillsUI({ error: "Erreur 500" })
       document.body.innerHTML = html
-      const message = await screen.getByText(/Erreur 500/)
+      const message = screen.getByText("Erreur 500")
       expect(message).toBeTruthy()
     })
   })
