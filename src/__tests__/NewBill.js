@@ -1,3 +1,9 @@
+/**
+* @jest-environment jsdom
+*/
+// Le commentaire ci-dessus est nécessaire pour que Jest comprenne que le test d'intégration
+// présent plus bas se fait dans l'environnement du DOM.
+
 import NewBill from "../containers/NewBill.js"
 import NewBillUI from "../views/NewBillUI.js"
 import { ROUTES } from "../constants/routes"
@@ -6,9 +12,9 @@ import firestore from "../app/Firestore.js"
 import { fireEvent, screen } from "@testing-library/dom"
 
 describe("Given I am connected as an employee", () => {
-  describe("When I am on NewBill Page and I submit a new bill", () => {
+  describe("When I am on New Bill Page and I submit a new bill", () => {
     test("Then the function to manage it is called", () => {
-      // Définition des paramètres de la ligne 39.
+      // Définition des paramètres de la ligne 45.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -50,9 +56,9 @@ describe("Given I am connected as an employee", () => {
     })
   })
 
-  describe("When I am on NewBill Page and I upload an invalid file", () => {
+  describe("When I am on New Bill Page and I upload an invalid file", () => {
     test("Then the functions to manage it are called", () => {
-      // Définition des paramètres de la ligne 102.
+      // Définition des paramètres de la ligne 108.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -83,14 +89,14 @@ describe("Given I am connected as an employee", () => {
         writable: true
       })
 
-      // Mocke la boite d'alerte pour les fichiers non valides.
+      // Simule la boite d'alerte pour les fichiers non valides.
       const alertMock = jest.fn()
       Object.defineProperty(window, "alert", {
         value: alertMock,
         writable: true
       })
 
-      // Mocke la fonction stockant le nom de fichier quand il est valide.
+      // Simule la fonction stockant le nom de fichier quand il est valide.
       const refMock = jest.fn()
       Object.defineProperty(firestore, "storage", {
         value: {
@@ -116,9 +122,9 @@ describe("Given I am connected as an employee", () => {
     })
   })
 
-  describe("When I am on NewBill Page and I upload a valid file", () => {
+  describe("When I am on New Bill Page and I upload a valid file", () => {
     test("Then the functions to manage it are called", () => {
-      // Définition des paramètres de la ligne 159.
+      // Définition des paramètres de la ligne 165.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -149,7 +155,7 @@ describe("Given I am connected as an employee", () => {
         writable: true
       })
 
-      // Mocke la boite d'alerte pour les fichiers non valides.
+      // Simule la boite d'alerte pour les fichiers non valides.
       const alertMock = jest.fn()
       Object.defineProperty(window, "alert", {
         value: alertMock,
@@ -161,10 +167,10 @@ describe("Given I am connected as an employee", () => {
 
       const handleChangeFile = jest.fn(nouvelleNote.handleChangeFile)
 
-      // Mocke la fonction successPut du container ligne 28 à 30.
+      // Simule la fonction successPut du container ligne 28 à 30.
       const successPut = jest.fn(nouvelleNote.successPut)
       
-      // Mocke la fonction successDwl du container ligne 32 à 35.
+      // Simule la fonction successDwl du container ligne 32 à 35.
       const successDwl = jest.fn(nouvelleNote.successDwl)
 
       const snapshot = jest.fn()
@@ -214,23 +220,37 @@ describe("Given I am connected as an employee", () => {
 
 // Test d'intégration POST à modifier.
 describe("Given I am connected as an employee", () => {
-  describe("When I am on NewBill Page and I submit a bill", () => {
-    test("Then it should add a bill", () => {
+  describe("When I am on New Bill Page and I submit a bill", () => {
+    test("Then it should render Bills page with the new bill", () => {
       jest.mock("../app/Firestore.js")
-      const mockBills = jest.fn(() => {
+
+      const mockBills = jest.fn((bill) => {
         return {
-          add: jest.fn().mockResolvedValue()
+          add: jest.fn().mockResolvedValue(bill)
         }
       })
-      //faire mock de navigate et vérifier appelé
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
-      firestore.bills = mockBills
-      const nouveau = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
-      nouveau.createBill() //bill en paramètre
 
+      // Fonction normale
+      /*const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }*/
+      // 1er mock
+      /*const onNavigateMock = jest.fn((pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      })*/
+      // 2ème mock
+      const onNavigateMock = jest.fn(pathname => document.body.innerHTML = ROUTES({ pathname }))
+
+      //const firestore = jest.fn()
+
+      firestore.bills = mockBills
+      const nouvelleNote = new NewBill({ document, onNavigate: onNavigateMock, firestore, localStorage: window.localStorage })
+      nouvelleNote.createBill() //bill en paramètre
+
+      //expect(firestore).toHaveBeenCalled()
       expect(firestore.bills).toHaveBeenCalled()
+      expect(mockBills).toHaveBeenCalled()
+      expect(onNavigateMock).toHaveBeenCalled() // Ne passe pas...
     })
   })
 })
