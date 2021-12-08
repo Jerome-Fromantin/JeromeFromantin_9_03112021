@@ -7,14 +7,13 @@
 import NewBill from "../containers/NewBill.js"
 import NewBillUI from "../views/NewBillUI.js"
 import { ROUTES } from "../constants/routes"
-import bills from "../fixtures/bills"
-import firestore from "../app/Firestore.js"
-import { fireEvent, screen } from "@testing-library/dom"
+import { bills } from "../fixtures/bills"
+import { fireEvent, getByText, screen, waitFor, waitForElementToBeRemoved } from "@testing-library/dom"
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on New Bill Page and I submit a new bill", () => {
     test("Then the function to manage it is called", () => {
-      // Définition des paramètres de la ligne 45.
+      // Définition des paramètres de la ligne 44.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -58,7 +57,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on New Bill Page and I upload an invalid file", () => {
     test("Then the functions to manage it are called", () => {
-      // Définition des paramètres de la ligne 108.
+      // Définition des paramètres de la ligne 107.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -124,7 +123,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on New Bill Page and I upload a valid file", () => {
     test("Then the functions to manage it are called", () => {
-      // Définition des paramètres de la ligne 165.
+      // Définition des paramètres de la ligne 164.
       const html = NewBillUI()
       document.body.innerHTML = html
 
@@ -167,22 +166,16 @@ describe("Given I am connected as an employee", () => {
 
       const handleChangeFile = jest.fn(nouvelleNote.handleChangeFile)
 
+      const snapshot = {
+        ref: {
+          getDownloadURL: jest.fn().mockResolvedValue("http://www.test.com")
+        }
+      }
+
       // Simule la fonction successPut du container ligne 28 à 30.
-      const successPut = jest.fn(nouvelleNote.successPut)
+      const successPut = jest.fn()
       
-      // Simule la fonction successDwl du container ligne 32 à 35.
-      const successDwl = jest.fn(nouvelleNote.successDwl)
-
-      const snapshot = jest.fn()
-      Object.defineProperty(snapshot, "ref", {
-        value: {
-          getDownloadURL: jest.fn(() => new Promise(successDwl))
-        },
-        writable: true
-      })
-
       const resolveProm = new Promise(jest.fn())
-      resolveProm.then = successDwl
 
       const resolveMock = jest.fn(() => resolveProm)
       const rejectMock = jest.fn()
@@ -190,7 +183,7 @@ describe("Given I am connected as an employee", () => {
       const promise = new Promise(successPut, rejectMock)
       promise.then = resolveMock
 
-      const putMock = jest.fn((file) => promise)
+      const putMock = jest.fn().mockResolvedValue(snapshot)
       const refMock = jest.fn((fileName) => ({put: putMock}))
       Object.defineProperty(firestore, "storage", {
         value: {
@@ -209,55 +202,75 @@ describe("Given I am connected as an employee", () => {
       expect(handleChangeFile).toHaveBeenCalled()
       expect(refMock).toHaveBeenCalled()
       expect(putMock).toHaveBeenCalled()
-      expect(resolveMock).toHaveBeenCalled()
-      expect(rejectMock).not.toHaveBeenCalled()
-      expect(successPut).toHaveBeenCalled()
-      expect(successDwl).toHaveBeenCalled()
-      expect(alertMock).not.toHaveBeenCalled()
     })
   })
 })
 
-// Test d'intégration POST à modifier.
+// Test d'intégration.
 describe("Given I am connected as an employee", () => {
   describe("When I am on New Bill Page and I submit a bill", () => {
-    test("Then it should render Bills page with the new bill", () => {
-      //jest.mock("../app/Firestore.js")
-
-      const mockBills = jest.fn((bill) => {
+    test("Then it should render Bills page with the new bill", async () => {
+      const mockBills = jest.fn(() => {
         return {
-          add: jest.fn().mockResolvedValue(bill)
+          add: jest.fn().mockResolvedValue()
         }
       })
 
-      // Fonction normale
-      /*const onNavigate = (pathname) => {
+      const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
-      }*/
-      // 1er mock
-      const onNavigateMock = jest.fn((pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      })
-      // 2ème mock
-      //const onNavigateMock2 = jest.fn(pathname => document.body.innerHTML = ROUTES({ pathname }))
+      }
 
       const firestore = jest.fn()
 
       firestore.bills = mockBills
-      const nouvelleNote = new NewBill({ document, onNavigate: onNavigateMock, firestore, localStorage: window.localStorage })
-      nouvelleNote.createBill() //bill en paramètre
 
-      //expect(firestore).toHaveBeenCalled()
+      const nouvelleNote = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
+      nouvelleNote.createBill(bills[0])
+
+      const onNavigateMock = jest.fn(nouvelleNote.successCreate)
+
       expect(firestore.bills).toHaveBeenCalled()
       expect(mockBills).toHaveBeenCalledTimes(1)
-      //expect(onNavigateMock).toHaveBeenCalled() // Ne passe pas...
-      //expect(onNavigateMock2).toHaveBeenCalled() // Ne passe pas...
+
+      waitForElementToBeRemoved(document.querySelector('form')).then(() => {
+        const pageTitle = getByText("Mes notes de frais")
+        
+        expect(pageTitle).toBeTruthy()
+        expect(onNavigateMock).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe("When I am on New Bill Page and I submit a bill which fails", () => {
+    test("Then it should stay on this page", async () => {
+      document.body.innerHTML = NewBillUI()
+      
+      const mockAdd = jest.fn().mockRejectedValue()
+      const mockBills = jest.fn(() => {
+        return {
+          add: mockAdd
+        }
+      })
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+
+      const firestore = jest.fn()
+
+      firestore.bills = mockBills
+
+      const nouvelleNote = new NewBill({ document, onNavigate, firestore, localStorage: window.localStorage })
+      
+      const onNavigateMock = jest.fn(nouvelleNote.failCreate)
+      nouvelleNote.createBill(bills[0])
+
+      expect(firestore.bills).toHaveBeenCalled()
+      expect(mockBills).toHaveBeenCalledTimes(1)
+
+      waitFor(() => expect(mockAdd).toHaveBeenCalled()).then(() => {
+        expect(onNavigateMock).toHaveBeenCalled()
+      })
     })
   })
 })
-
-/*
-Ouais pour les test d'intégration, pour le get tu check juste si déjà les bonnes fonctions sont
-appelées et si tu recup bien les data que tu attends ( les data mockées dans les fixtures en gros)
-pour le post tu check juste si les bonnes fonctions sont appelées avec les bons paramètres
-*/

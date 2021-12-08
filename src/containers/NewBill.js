@@ -46,7 +46,7 @@ export default class NewBill {
       .ref(`justificatifs/${this.fileName}`)
       .put(file)
       .then(this.successPut)
-      .then(this.successDwl)
+      .then(this.successDwl.bind(this))
     }
     else {
       document.querySelector(`input[data-testid="file"]`).value = null
@@ -58,7 +58,6 @@ export default class NewBill {
 
   handleSubmit = e => {
     e.preventDefault()
-    // console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
     const email = JSON.parse(localStorage.getItem("user")).email
     const bill = {
       email,
@@ -77,16 +76,22 @@ export default class NewBill {
     this.onNavigate(ROUTES_PATH['Bills'])
   }
 
+  successCreate = () => {
+    this.onNavigate(ROUTES_PATH['Bills'])
+  }
+
+  failCreate = (error) => {
+    console.error(error)
+  } 
+
   // not need to cover this function by tests
   createBill = (bill) => {
     if (this.firestore) {
       this.firestore
       .bills()
       .add(bill)
-      .then(() => {
-        this.onNavigate(ROUTES_PATH['Bills'])
-      })
-      .catch(error => error)
+      .then(this.successCreate.bind(this))
+      .catch(this.failCreate)
     }
   }
 }
