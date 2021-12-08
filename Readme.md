@@ -25,9 +25,6 @@ Travail réalisé :
 - Coverage de 100% pour le fichier "views/BillsUI.js",
 - Finition du test d'intégration "Bills",
 - Finition des tests unitaires,
-- Début de mise en place d'un test d'intégration (pour "NewBill").
+- Finition du test d'intégration "NewBill".
 
-Travail à faire :
-- Améliorations éventuelles du "Bug hunt - Dashboard",
-- Continuation du deuxième test d'intégration.
-- Et d'autres choses ??
+Ce projet est désormais terminé mais peut éventuellement être amélioré.
