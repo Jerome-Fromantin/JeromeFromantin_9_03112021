@@ -1,6 +1,6 @@
 import { formatDate } from '../app/format.js'
 import DashboardFormUI from '../views/DashboardFormUI.js'
-//import BigBilledIcon from '../assets/svg/big_billed.js'
+import BigBilledIcon from '../assets/svg/big_billed.js'
 import { ROUTES_PATH } from '../constants/routes.js'
 import USERS_TEST from '../constants/usersTest.js'
 import Logout from "./Logout.js"
@@ -103,8 +103,7 @@ export default class {
       $('.vertical-navbar').css({ height: '150vh' })
       this.counter ++
     }
-    // PARTIE A SUPPRIMER POUR CORRIGER LE BUG.
-    /*else {
+    else {
       $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
 
       $('.dashboard-right-container div').html(`
@@ -112,7 +111,7 @@ export default class {
       `)
       $('.vertical-navbar').css({ height: '120vh' })
       this.counter ++
-    }*/
+    }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
     $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, bill))
@@ -139,11 +138,15 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {
+    let filteredbills = [] // Code ajouté.
     if (this.counter === undefined || this.index !== index) this.counter = 0
     if (this.index === undefined || this.index !== index) this.index = index
     if (this.counter % 2 === 0) {
+      filteredbills = filteredBills(bills, getStatus(this.index)) // Code ajouté.
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
-      $(`#status-bills-container${this.index}`).html(cards(filteredBills(bills, getStatus(this.index))))
+      // Ci-dessous, ligne de code original.
+      //$(`#status-bills-container${this.index}`).html(cards(filteredBills(bills, getStatus(this.index))))
+      $(`#status-bills-container${this.index}`).html(cards(filteredbills)) // Code modifié.
       this.counter ++
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
@@ -152,12 +155,13 @@ export default class {
       this.counter ++
     }
 
-    bills.forEach(bill => {
+    //bills.forEach(bill => {       // Code original.
+    filteredbills.forEach(bill => { // Code modifié.
+    //filteredBills(bills, getStatus(this.index)).forEach(bill => { // Correction alternative.
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
     })
 
     return bills
-
   }
 
   // not need to cover this function by tests
